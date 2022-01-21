@@ -1,0 +1,3 @@
+/home/pouya/Desktop/BP-Project/build/CMakeFiles/rebuild_cache.dir
+/home/pouya/Desktop/BP-Project/build/CMakeFiles/edit_cache.dir
+/home/pouya/Desktop/BP-Project/build/CMakeFiles/main.dir

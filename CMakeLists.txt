@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+project("Initial name")
+include_directories("/usr/include/SDL2")
+add_executable(main main.c)
+target_link_libraries(main m SDL2 SDL2_gfx SDL2_image)
