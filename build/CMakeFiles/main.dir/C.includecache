@@ -6,7 +6,15 @@
 
 #IncludeRegexTransform: 
 
+/home/pouya/Desktop/BP-Project/constants.h
+structs.h
+/home/pouya/Desktop/BP-Project/structs.h
+
 /home/pouya/Desktop/BP-Project/helping-functions.h
+constants.h
+/home/pouya/Desktop/BP-Project/constants.h
+
+/home/pouya/Desktop/BP-Project/include.h
 SDL2/SDL.h
 -
 SDL2/SDL_timer.h
@@ -17,14 +25,18 @@ SDL2/SDL2_gfxPrimitives.h
 -
 math.h
 -
-
-/home/pouya/Desktop/BP-Project/main.c
 stdio.h
 -
+
+/home/pouya/Desktop/BP-Project/main.c
 map.h
 /home/pouya/Desktop/BP-Project/map.h
 
 /home/pouya/Desktop/BP-Project/map.h
 helping-functions.h
 /home/pouya/Desktop/BP-Project/helping-functions.h
+
+/home/pouya/Desktop/BP-Project/structs.h
+include.h
+/home/pouya/Desktop/BP-Project/include.h
 
