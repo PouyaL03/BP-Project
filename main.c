@@ -2,6 +2,6 @@
 
 int main()
 {
-    draw_map();
+    start_game();
     return 0;
 }

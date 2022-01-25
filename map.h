@@ -1,18 +1,36 @@
 #include "helping-functions.h"
 
 /*function prototypes*/
-void draw_map();
+void start_game();
+void draw_map(SDL_Renderer*, country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row]);
 
-void draw_map()
+void draw_map(SDL_Renderer* renderer, country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row])
+{
+    for (int i=0 ; i<number_of_hexagons_in_column ; i++)
+    {
+        for (int j=0 ; j<number_of_hexagons_in_row ; j++)
+        {
+            Uint8 alpha=255;
+            draw_hexagon_borderline(renderer, all_countries[i][j].x_center,
+                                   all_countries[i][j].y_center,
+                                   initial_side_length,
+                                   all_countries[i][j].color,
+                                   alpha);
+        }
+    }
+}
+
+void start_game()
 {
     /*initializing graphic system*/
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER);
     /*initializinig the windows*/
+    Uint32 window_flags=SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
     SDL_Window* window= SDL_CreateWindow("Initial window",
                                         SDL_WINDOWPOS_UNDEFINED,
                                         SDL_WINDOWPOS_UNDEFINED, 
                                         window_width, window_height, 
-                                        SDL_WINDOW_RESIZABLE);
+                                        window_flags);
     /*creating the renderer*/
     Uint32 render_flags=SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, render_flags);
@@ -29,11 +47,11 @@ void draw_map()
     float x_position=(window_width-destination.w)/2;
     float y_position=(window_height-destination.h)/2;
     /*setting background color*/
-    SDL_SetRenderDrawColor(renderer, 220, 220, 220, 255);
-    destination.x=x_position;
-    destination.y=y_position;
+    SDL_SetRenderDrawColor(renderer, colors[7].r, colors[7].g, colors[7].b, 255);
     SDL_Point mouse_position;
     int close_requested=0;
+    country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row];
+    create_random_map(all_countries);
     /*------------------------------------------------------------------------------------*/
     while (!close_requested)
     {
@@ -46,22 +64,11 @@ void draw_map()
                     printf("khaste nabashid.\n");
                     close_requested=1;
                     break;
-                case (SDL_WINDOWEVENT):
-                    switch(event.window.event)
-                    {
-                        case(SDL_WINDOWEVENT_RESIZED):
-                            window_width=event.window.data1;
-                            window_height=event.window.data2;
-                            printf("window resized.\n");
-                            break;
-                    }
             }
         }
+        SDL_SetRenderDrawColor(renderer, colors[7].r, colors[7].g, colors[7].b, 255);
         SDL_RenderClear(renderer);
-        // SDL_SetRenderDrawColor(renderer, 240, 240, 240, 255);
-        // SDL_Delay(1000);
-        // SDL_RenderCopy(renderer, texture, NULL, &destination);
-        draw_hexagon(renderer, window_width/2, window_height/2, 0);
+        draw_map(renderer, all_countries);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);
     }

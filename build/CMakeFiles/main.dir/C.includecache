@@ -27,6 +27,8 @@ math.h
 -
 stdio.h
 -
+time.h
+-
 
 /home/pouya/Desktop/BP-Project/main.c
 map.h
