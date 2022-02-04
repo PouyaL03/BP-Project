@@ -10,7 +10,9 @@ const int FPS=24;
 #define number_of_colors 8
 #define pi M_PI
 #define teta pi/3
-int waiting_for_client=0;
+#define maximum_number_of_soldiers 90
+int waiting_for_attack=0;
+double initial_speed_of_players=10;
 
 // double speed_of_generation= ;
 double speed_of_soldiers;

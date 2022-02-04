@@ -17,9 +17,10 @@ void start_game()
     /*creating the renderer*/
     Uint32 render_flags=SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, render_flags);
-    /**/
+    /*opening the font*/
     TTF_Init();
     TTF_Font* font=TTF_OpenFont("../fonts/TNR.ttf", 26);
+    TTF_Font* bold_font=TTF_OpenFont("../fonts/TNR_B.ttf", 24);
     /*select color of background*/
     SDL_Surface* surface = IMG_Load("../images/sample-picture.png");
     /*loading the texture to the windows*/
@@ -38,26 +39,19 @@ void start_game()
     SDL_Point mouse_position;
 
     int close_requested=0;
-
+    int total_frames=0;
     /*initializing countries*/
     country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row];
     create_random_map(all_countries);
-    country country_array[number_of_hexagons_in_column*number_of_hexagons_in_row];
+    country country_array[number_of_countries];
     initialize_country_array(country_array, all_countries);
+    attack* attack_head=NULL;
     /*------------------------------------------------------------------------------------*/
     while (!close_requested)
     {
         SDL_Event event;
-        while(SDL_PollEvent(&event))
-        {
-            switch (event.type)
-            {
-                case (SDL_QUIT):
-                    printf("khaste nabashid.\n");
-                    close_requested=1;
-                    break;
-            }
-        }
+        event_handling(&event, country_array, mouse_position, &close_requested, &attack_head);
+        update_number_of_soldiers(country_array, total_frames);
         SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
         check_mouse_state(mouse_position, country_array, initial_side_length*sin(teta));
         SDL_SetRenderDrawColor(renderer,
@@ -65,9 +59,11 @@ void start_game()
                                colors[background_color].g,
                                colors[background_color].b, 255);
         SDL_RenderClear(renderer);
-        draw_map(renderer, country_array, font);
+        update_attacking_soldiers_position(country_array, &attack_head, total_frames);
+        draw_map(renderer, country_array, bold_font, font, &attack_head);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);
+        total_frames++;
     }
     // clean up resources before exiting
     SDL_DestroyTexture(texture);

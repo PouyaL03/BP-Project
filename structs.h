@@ -1,7 +1,9 @@
 #include "include.h"
 typedef struct soldier
 {
-
+    int color;
+    SDL_Point soldier_position;
+    struct soldier* next_soldier;
 }
 soldier;
 
@@ -14,7 +16,10 @@ barracks;
 
 typedef struct potion
 {
-
+    int increase_soldiers_movement_speed;
+    int decrease_enemy_soldiers_movement_speed;
+    int enemy_soldiers_change_side;
+    int increase_soldiers_generation_speed;
 }
 potion;
 
@@ -28,6 +33,19 @@ typedef struct country
     int number_of_soldiers;
     int is_attacking;
     /*usage is for potions*/
-    int efficiency;
+    int soldiers_in_use;
 }
 country;
+
+typedef struct attack
+{
+    int attack_complete;
+    int attacking_country_index;
+    int defenfing_country_index;
+    soldier* soldier_head;
+    struct attack* next_attack;
+    int maximum_soldiers_in_attack;
+    int total_soldiers_in_attack;
+    int attack_finished;
+}
+attack;
