@@ -10,6 +10,10 @@
 structs.h
 /home/pouya/Desktop/BP-Project/structs.h
 
+/home/pouya/Desktop/BP-Project/game.h
+map.h
+/home/pouya/Desktop/BP-Project/map.h
+
 /home/pouya/Desktop/BP-Project/helping-functions.h
 constants.h
 /home/pouya/Desktop/BP-Project/constants.h
@@ -23,6 +27,8 @@ SDL2/SDL_image.h
 -
 SDL2/SDL2_gfxPrimitives.h
 -
+SDL2/SDL_ttf.h
+-
 math.h
 -
 stdio.h
@@ -31,8 +37,8 @@ time.h
 -
 
 /home/pouya/Desktop/BP-Project/main.c
-map.h
-/home/pouya/Desktop/BP-Project/map.h
+game.h
+/home/pouya/Desktop/BP-Project/game.h
 
 /home/pouya/Desktop/BP-Project/map.h
 helping-functions.h
