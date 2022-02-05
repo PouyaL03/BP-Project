@@ -22,10 +22,9 @@ void show_attacking_soldiers(SDL_Renderer* renderer, country* country_array, att
                 country_array[temp_attack_head->attacking_country_index].x_center-temp_soldier_head->soldier_position_x>-5 &&
                 country_array[temp_attack_head->attacking_country_index].y_center-temp_soldier_head->soldier_position_y>-5))
                 {
-                    if (!(country_array[temp_attack_head->defenfing_country_index].x_center-temp_soldier_head->soldier_position_x<5 &&
-                          country_array[temp_attack_head->defenfing_country_index].y_center-temp_soldier_head->soldier_position_y<5 &&
-                          country_array[temp_attack_head->defenfing_country_index].x_center-temp_soldier_head->soldier_position_x>-5 &&
-                          country_array[temp_attack_head->defenfing_country_index].y_center-temp_soldier_head->soldier_position_y>-5))
+                    if ((country_array[temp_attack_head->attacking_country_index].x_center-temp_soldier_head->soldier_position_x)*(country_array[temp_attack_head->attacking_country_index].x_center-temp_soldier_head->soldier_position_x)+
+                        (country_array[temp_attack_head->attacking_country_index].y_center-temp_soldier_head->soldier_position_y)*(country_array[temp_attack_head->attacking_country_index].y_center-temp_soldier_head->soldier_position_y)>
+                        (radius_of_circle*1.5)*(radius_of_circle*1.5))
                           filledCircleRGBA(renderer, temp_soldier_head->soldier_position_x,
                                                temp_soldier_head->soldier_position_y,
                                                radius_of_circle/2,
@@ -95,7 +94,7 @@ void draw_map(SDL_Renderer* renderer, country all_countries[number_of_countries]
                                     alpha);
             aacircleRGBA(renderer, all_countries[i].x_center, all_countries[i].y_center, radius_of_circle, 0, 0, 0, 255);
         }
-        int number_of_soldiers=all_countries[i].number_of_soldiers;
+        int number_of_soldiers=all_countries[i].number_of_soldiers+all_countries[i].soldiers_in_use;
         int x_corner_rect=all_countries[i].x_center;
         int y_corner_rect=all_countries[i].y_center+radius_of_circle;
         if(all_countries[i].color!=unallocated_color) show_number_of_soldiers(renderer, x_corner_rect, y_corner_rect, number_of_soldiers, bold_font);

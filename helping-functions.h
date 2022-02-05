@@ -10,12 +10,120 @@ void update_number_of_soldiers(country*, int);
 int find_country_index(country*, SDL_Point, double);
 void event_handling(SDL_Event*, country*, SDL_Point, int*, attack**);
 void update_attacking_soldiers_position(country*, attack**, int);
-void check_for_collisions(attack**);
+void check_for_collisions(attack**, country*);
 void initialize_soldiers(attack**, country*);
+void update_attack_head(attack**);
 
-void check_for_collisions(attack** attack_head)
+void check_for_collisions(attack** attack_head, country* country_array)
 {
+    attack* tmp_attack_head=(*attack_head);
+    for ( ; tmp_attack_head!=NULL ; tmp_attack_head=tmp_attack_head->next_attack)
+    {
+        if (tmp_attack_head->attack_complete==0) continue;
+        if (tmp_attack_head->next_attack!=NULL)
+        {
+            if (tmp_attack_head->next_attack->soldier_head==NULL)
+            {
+                tmp_attack_head->next_attack=tmp_attack_head->next_attack->next_attack;
+            }
+        }
+        else if (tmp_attack_head->next_attack==NULL)
+        {
+            if (tmp_attack_head->soldier_head==NULL)
+            {
+                tmp_attack_head=NULL;
+                break;
+            }
+        }
+        soldier* tmp_soldier_head=tmp_attack_head->soldier_head;
+        if (tmp_soldier_head==NULL) continue;
+        attack* second_tmp_attack_head=(*attack_head);
+        for ( ; second_tmp_attack_head!=NULL ; second_tmp_attack_head=second_tmp_attack_head->next_attack)
+        {
+            if (second_tmp_attack_head==tmp_attack_head) continue;
+            if (second_tmp_attack_head->attack_complete==0) continue;
+            if (second_tmp_attack_head->next_attack!=NULL)
+            {
+                if (second_tmp_attack_head->next_attack->soldier_head==NULL)
+                {
+                    second_tmp_attack_head->next_attack=second_tmp_attack_head->next_attack->next_attack;
+                }
+            }
+            else if (second_tmp_attack_head->next_attack==NULL)
+            {
+                if (second_tmp_attack_head->soldier_head==NULL)
+                {
+                    second_tmp_attack_head=NULL;
+                    break;
+                }
+            }
+            soldier* second_tmp_soldier_head=second_tmp_attack_head->soldier_head;
+            if (second_tmp_soldier_head==NULL) continue;
+            if ((second_tmp_attack_head->soldier_head->soldier_position_x-tmp_attack_head->soldier_head->soldier_position_x)*(second_tmp_attack_head->soldier_head->soldier_position_x-tmp_attack_head->soldier_head->soldier_position_x)+
+                (second_tmp_attack_head->soldier_head->soldier_position_y-tmp_attack_head->soldier_head->soldier_position_y)*(second_tmp_attack_head->soldier_head->soldier_position_y-tmp_attack_head->soldier_head->soldier_position_y)<=
+                (radius_of_circle)*(radius_of_circle))
+            {
+                if (second_tmp_attack_head->soldier_head->color!=tmp_attack_head->soldier_head->color)
+                {
+                    if ((country_array[second_tmp_attack_head->attacking_country_index].x_center-second_tmp_soldier_head->soldier_position_x)*(country_array[second_tmp_attack_head->attacking_country_index].x_center-second_tmp_soldier_head->soldier_position_x) +
+                        (country_array[second_tmp_attack_head->attacking_country_index].y_center-second_tmp_soldier_head->soldier_position_y)*(country_array[second_tmp_attack_head->attacking_country_index].y_center-second_tmp_soldier_head->soldier_position_y) <=
+                        space_between_two_soldiers*space_between_two_soldiers)
+                    {
+                        country_array[second_tmp_attack_head->attacking_country_index].soldiers_in_use--;
+                    }
+                    if ((country_array[tmp_attack_head->attacking_country_index].x_center-tmp_soldier_head->soldier_position_x)*(country_array[tmp_attack_head->attacking_country_index].x_center-tmp_soldier_head->soldier_position_x) +
+                        (country_array[tmp_attack_head->attacking_country_index].y_center-tmp_soldier_head->soldier_position_y)*(country_array[tmp_attack_head->attacking_country_index].y_center-tmp_soldier_head->soldier_position_y) <=
+                        space_between_two_soldiers*space_between_two_soldiers)
+                    {
+                        country_array[tmp_attack_head->attacking_country_index].soldiers_in_use--;
+                    }
+                    soldier* garbage=tmp_soldier_head;
+                    tmp_soldier_head=tmp_soldier_head->next_soldier;
+                    (tmp_attack_head)->soldier_head=tmp_soldier_head;
+                    free(garbage);
+                    garbage=second_tmp_soldier_head;
+                    second_tmp_soldier_head=second_tmp_soldier_head->next_soldier;
+                    second_tmp_attack_head->soldier_head=second_tmp_soldier_head;
+                    free(garbage);
+                }
+            }
+            for ( ; second_tmp_soldier_head!=NULL ; second_tmp_soldier_head=second_tmp_soldier_head->next_soldier)
+            {
+                if (second_tmp_soldier_head==NULL) break;
+                if (tmp_soldier_head==NULL) break;
+                if (second_tmp_soldier_head->next_soldier==NULL) break;
+                if ((second_tmp_soldier_head->next_soldier->soldier_position_x-tmp_attack_head->soldier_head->soldier_position_x)*(second_tmp_soldier_head->next_soldier->soldier_position_x-tmp_attack_head->soldier_head->soldier_position_x)+
+                    (second_tmp_soldier_head->next_soldier->soldier_position_y-tmp_attack_head->soldier_head->soldier_position_y)*(second_tmp_soldier_head->next_soldier->soldier_position_y-tmp_attack_head->soldier_head->soldier_position_y)<=
+                    (radius_of_circle)*(radius_of_circle))
+                {
+                    if (second_tmp_soldier_head->color!=tmp_attack_head->soldier_head->color)
+                    {
+                        printf("I'm here bitches.\n");
+                        if ((country_array[second_tmp_attack_head->attacking_country_index].x_center-second_tmp_soldier_head->soldier_position_x)*(country_array[second_tmp_attack_head->attacking_country_index].x_center-second_tmp_soldier_head->soldier_position_x) +
+                            (country_array[second_tmp_attack_head->attacking_country_index].y_center-second_tmp_soldier_head->soldier_position_y)*(country_array[second_tmp_attack_head->attacking_country_index].y_center-second_tmp_soldier_head->soldier_position_y) <=
+                            space_between_two_soldiers*space_between_two_soldiers)
+                        {
+                            country_array[second_tmp_attack_head->attacking_country_index].soldiers_in_use--;
+                        }
+                        if ((country_array[tmp_attack_head->attacking_country_index].x_center-tmp_soldier_head->soldier_position_x)*(country_array[tmp_attack_head->attacking_country_index].x_center-tmp_soldier_head->soldier_position_x) +
+                            (country_array[tmp_attack_head->attacking_country_index].y_center-tmp_soldier_head->soldier_position_y)*(country_array[tmp_attack_head->attacking_country_index].y_center-tmp_soldier_head->soldier_position_y) <=
+                            space_between_two_soldiers*space_between_two_soldiers)
+                        {
+                            country_array[tmp_attack_head->attacking_country_index].soldiers_in_use--;
+                        }
+                        soldier* garbage=tmp_soldier_head;
+                        tmp_soldier_head=tmp_soldier_head->next_soldier;
+                        (tmp_attack_head)->soldier_head=tmp_soldier_head;
+                        free(garbage);
+                        garbage=second_tmp_soldier_head->next_soldier;
+                        second_tmp_soldier_head->next_soldier=second_tmp_soldier_head->next_soldier->next_soldier;
+                        free(garbage);
+                    }
 
+                }
+            }
+        }
+    }
 }
 
 void initialize_soldiers(attack** attack_head, country* country_array)
@@ -39,7 +147,7 @@ void initialize_soldiers(attack** attack_head, country* country_array)
 
 void update_attacking_soldiers_position(country* country_array, attack** attack_head, int total_frames)
 {
-    check_for_collisions(attack_head);
+    check_for_collisions(attack_head, country_array);
     attack* tmp_attack_head=(*attack_head);
     for ( ; tmp_attack_head!=NULL ; tmp_attack_head=tmp_attack_head->next_attack)
     {
@@ -48,7 +156,9 @@ void update_attacking_soldiers_position(country* country_array, attack** attack_
         {
             if (tmp_attack_head->next_attack->soldier_head==NULL)
             {
+                attack* garbage=tmp_attack_head->next_attack;
                 tmp_attack_head->next_attack=tmp_attack_head->next_attack->next_attack;
+                free(garbage);
             }
         }
         else if (tmp_attack_head->next_attack==NULL)
@@ -106,19 +216,25 @@ void update_attacking_soldiers_position(country* country_array, attack** attack_
             tmp_soldier_head->soldier_position_y+=initial_speed_of_players*sinus;
             if ((tmp_soldier_head->soldier_position_x-attacking_x)*(tmp_soldier_head->soldier_position_x-attacking_x)+
                 (tmp_soldier_head->soldier_position_y-attacking_y)*(tmp_soldier_head->soldier_position_y-attacking_y)<
-                (5*initial_speed_of_players)*(5*initial_speed_of_players))
+                space_between_two_soldiers*space_between_two_soldiers)
                 break;
-            // if ((tmp_soldier_head->soldier_position_x-attacking_x)*(tmp_soldier_head->soldier_position_x-attacking_x)+
-            //     (tmp_soldier_head->soldier_position_y-attacking_y)*(tmp_soldier_head->soldier_position_y-attacking_y)>
-            //     (3*initial_speed_of_players)*(3*initial_speed_of_players))
-            // {
-            //     if (!(tmp_soldier_head->already_counted))
-            //     {
-            //         tmp_soldier_head->already_counted=1;
-            //         country_array[tmp_attack_head->attacking_country_index].number_of_soldiers--;
-            //     }
-            // }
+            if ((tmp_soldier_head->soldier_position_x-attacking_x)*(tmp_soldier_head->soldier_position_x-attacking_x)+
+                (tmp_soldier_head->soldier_position_y-attacking_y)*(tmp_soldier_head->soldier_position_y-attacking_y)>
+                space_between_two_soldiers*space_between_two_soldiers)
+            {
+                if (!(tmp_soldier_head->already_counted))
+                {
+                    tmp_soldier_head->already_counted=1;
+                    country_array[tmp_attack_head->attacking_country_index].soldiers_in_use--;
+                }
+            }
         }
+    }
+    if ((*attack_head)!=NULL&&(*attack_head)->soldier_head==NULL)
+    {
+        attack* garbage=*attack_head;
+        (*attack_head)=(*attack_head)->next_attack;
+        free(garbage);
     }
 }
 
@@ -141,7 +257,7 @@ void event_handling(SDL_Event* event, country* country_array, SDL_Point mouse_po
                         {    
                             if (waiting_for_attack==0)
                             {
-                                if (country_array[which_country].color!=unallocated_color && country_array[which_country].color!=no_player_color)
+                                if (country_array[which_country].color==blue)
                                 {
                                     waiting_for_attack=1;
                                     attack* tmp=malloc(sizeof(attack));
@@ -170,10 +286,9 @@ void event_handling(SDL_Event* event, country* country_array, SDL_Point mouse_po
                                     (*attack_head)->defenfing_country_index=which_country;
                                     int tmp_maximum_soldiers_in_attack=country_array[(*attack_head)->attacking_country_index].number_of_soldiers-
                                                                    country_array[(*attack_head)->attacking_country_index].soldiers_in_use;
-                                    // country_array[(*attack_head)->attacking_country_index].soldiers_in_use+=tmp_maximum_soldiers_in_attack;
-                                    // (*attack_head)->maximum_soldiers_in_attack=tmp_maximum_soldiers_in_attack;
                                     (*attack_head)->soldier_head=(soldier*)malloc(sizeof(soldier));
                                     initialize_soldiers(attack_head, country_array);
+                                    country_array[(*attack_head)->attacking_country_index].soldiers_in_use+=country_array[(*attack_head)->attacking_country_index].number_of_soldiers;
                                     country_array[(*attack_head)->attacking_country_index].number_of_soldiers=0;
                                 }
                             }
@@ -237,8 +352,14 @@ void check_mouse_state(SDL_Point mouse_position, country country_array[number_of
     {
         if ((country_array[i].x_center-mouse_position.x)*(country_array[i].x_center-mouse_position.x) +
              (country_array[i].y_center-mouse_position.y)*(country_array[i].y_center-mouse_position.y) 
-             < check_radius*check_radius) country_array[i].glow_flag=1;
-             else country_array[i].glow_flag=0;
+             < check_radius*check_radius)
+        {
+            if (country_array[i].color==blue && waiting_for_attack==0)
+                country_array[i].glow_flag=1;
+            else if (country_array[i].color!=unallocated_color && waiting_for_attack==1)
+                country_array[i].glow_flag=1;
+        }
+        else country_array[i].glow_flag=0;
     }
 }
 

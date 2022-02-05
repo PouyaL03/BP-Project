@@ -10,13 +10,6 @@ typedef struct soldier
 }
 soldier;
 
-typedef struct barracks
-{
-    int number_of_soldiers;
-    int color;
-}
-barracks;
-
 typedef struct potion
 {
     int increase_soldiers_movement_speed;
@@ -32,11 +25,9 @@ typedef struct country
     double y_center;
     int color;
     int glow_flag;
-    barracks barrack_in_country;
     int number_of_soldiers;
-    int is_attacking;
-    /*usage is for potions*/
     int soldiers_in_use;
+    /*usage is for potions*/
 }
 country;
 
