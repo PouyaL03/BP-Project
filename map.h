@@ -13,15 +13,21 @@ void show_attacking_soldiers(SDL_Renderer* renderer, country* country_array, att
     attack* temp_attack_head=*attack_head;
     for ( ; temp_attack_head!=NULL; temp_attack_head=temp_attack_head->next_attack)
     {
-        if (temp_attack_head->attack_complete!=1) continue;
+        if (temp_attack_head->attack_complete==0) continue;
         soldier* temp_soldier_head=temp_attack_head->soldier_head;
         while (temp_soldier_head!=NULL)
         {
-            if (!(country_array[temp_attack_head->attacking_country_index].x_center-temp_soldier_head->soldier_position.x<5 &&
-                country_array[temp_attack_head->attacking_country_index].y_center-temp_soldier_head->soldier_position.y<5)) 
+            if (!(country_array[temp_attack_head->attacking_country_index].x_center-temp_soldier_head->soldier_position_x<5 &&
+                country_array[temp_attack_head->attacking_country_index].y_center-temp_soldier_head->soldier_position_y<5 &&
+                country_array[temp_attack_head->attacking_country_index].x_center-temp_soldier_head->soldier_position_x>-5 &&
+                country_array[temp_attack_head->attacking_country_index].y_center-temp_soldier_head->soldier_position_y>-5))
                 {
-                    filledCircleRGBA(renderer, temp_soldier_head->soldier_position.x,
-                                               temp_soldier_head->soldier_position.y,
+                    if (!(country_array[temp_attack_head->defenfing_country_index].x_center-temp_soldier_head->soldier_position_x<5 &&
+                          country_array[temp_attack_head->defenfing_country_index].y_center-temp_soldier_head->soldier_position_y<5 &&
+                          country_array[temp_attack_head->defenfing_country_index].x_center-temp_soldier_head->soldier_position_x>-5 &&
+                          country_array[temp_attack_head->defenfing_country_index].y_center-temp_soldier_head->soldier_position_y>-5))
+                          filledCircleRGBA(renderer, temp_soldier_head->soldier_position_x,
+                                               temp_soldier_head->soldier_position_y,
                                                radius_of_circle/2,
                                                dark_colors[temp_soldier_head->color].r,
                                                dark_colors[temp_soldier_head->color].g,

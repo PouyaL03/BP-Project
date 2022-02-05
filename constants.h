@@ -1,9 +1,9 @@
 #include "structs.h"
 #define window_width 1280
 #define window_height 960
-#define number_of_hexagons_in_row 8
-#define number_of_hexagons_in_column 6
-#define number_of_countries 48
+#define number_of_hexagons_in_row 7
+#define number_of_hexagons_in_column 5
+#define number_of_countries 35
 double initial_side_length=70;
 double radius_of_circle=20;
 const int FPS=24;
@@ -13,6 +13,7 @@ const int FPS=24;
 #define maximum_number_of_soldiers 90
 int waiting_for_attack=0;
 double initial_speed_of_players=10;
+double initial_distance_between_players=50;
 
 // double speed_of_generation= ;
 double speed_of_soldiers;

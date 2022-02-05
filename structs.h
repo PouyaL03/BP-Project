@@ -2,7 +2,10 @@
 typedef struct soldier
 {
     int color;
+    double soldier_position_x;
+    double soldier_position_y;
     SDL_Point soldier_position;
+    int already_counted;
     struct soldier* next_soldier;
 }
 soldier;
