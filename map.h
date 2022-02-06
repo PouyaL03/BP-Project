@@ -22,9 +22,9 @@ void show_attacking_soldiers(SDL_Renderer* renderer, country* country_array, att
                 country_array[temp_attack_head->attacking_country_index].x_center-temp_soldier_head->soldier_position_x>-5 &&
                 country_array[temp_attack_head->attacking_country_index].y_center-temp_soldier_head->soldier_position_y>-5))
                 {
-                    if ((country_array[temp_attack_head->attacking_country_index].x_center-temp_soldier_head->soldier_position_x)*(country_array[temp_attack_head->attacking_country_index].x_center-temp_soldier_head->soldier_position_x)+
-                        (country_array[temp_attack_head->attacking_country_index].y_center-temp_soldier_head->soldier_position_y)*(country_array[temp_attack_head->attacking_country_index].y_center-temp_soldier_head->soldier_position_y)>
-                        (radius_of_circle*1.5)*(radius_of_circle*1.5))
+                    if ((country_array[temp_attack_head->defenfing_country_index].x_center-temp_soldier_head->soldier_position_x)*(country_array[temp_attack_head->defenfing_country_index].x_center-temp_soldier_head->soldier_position_x)+
+                        (country_array[temp_attack_head->defenfing_country_index].y_center-temp_soldier_head->soldier_position_y)*(country_array[temp_attack_head->defenfing_country_index].y_center-temp_soldier_head->soldier_position_y)>
+                        (radius_of_circle)*(radius_of_circle))
                           filledCircleRGBA(renderer, temp_soldier_head->soldier_position_x,
                                                temp_soldier_head->soldier_position_y,
                                                radius_of_circle/2,

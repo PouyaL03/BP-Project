@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/pouya/Desktop/BP-Project/build",
-  "command": "/bin/x86_64-linux-gnu-gcc-9  -I/usr/include/SDL2  -g   -o CMakeFiles/main.dir/main.c.o   -c /home/pouya/Desktop/BP-Project/main.c",
-  "file": "/home/pouya/Desktop/BP-Project/main.c"
-}
-]

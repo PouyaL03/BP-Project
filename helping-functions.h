@@ -59,6 +59,7 @@ void check_for_collisions(attack** attack_head, country* country_array)
             }
             soldier* second_tmp_soldier_head=second_tmp_attack_head->soldier_head;
             if (second_tmp_soldier_head==NULL) continue;
+            if (tmp_attack_head->soldier_head==NULL) continue;
             if ((second_tmp_attack_head->soldier_head->soldier_position_x-tmp_attack_head->soldier_head->soldier_position_x)*(second_tmp_attack_head->soldier_head->soldier_position_x-tmp_attack_head->soldier_head->soldier_position_x)+
                 (second_tmp_attack_head->soldier_head->soldier_position_y-tmp_attack_head->soldier_head->soldier_position_y)*(second_tmp_attack_head->soldier_head->soldier_position_y-tmp_attack_head->soldier_head->soldier_position_y)<=
                 (radius_of_circle)*(radius_of_circle))
@@ -98,7 +99,6 @@ void check_for_collisions(attack** attack_head, country* country_array)
                 {
                     if (second_tmp_soldier_head->color!=tmp_attack_head->soldier_head->color)
                     {
-                        printf("I'm here bitches.\n");
                         if ((country_array[second_tmp_attack_head->attacking_country_index].x_center-second_tmp_soldier_head->soldier_position_x)*(country_array[second_tmp_attack_head->attacking_country_index].x_center-second_tmp_soldier_head->soldier_position_x) +
                             (country_array[second_tmp_attack_head->attacking_country_index].y_center-second_tmp_soldier_head->soldier_position_y)*(country_array[second_tmp_attack_head->attacking_country_index].y_center-second_tmp_soldier_head->soldier_position_y) <=
                             space_between_two_soldiers*space_between_two_soldiers)
@@ -274,7 +274,6 @@ void event_handling(SDL_Event* event, country* country_array, SDL_Point mouse_po
                                     (*attack_head)->attacking_country_index=which_country;
                                     (*attack_head)->attack_complete=0;
                                     (*attack_head)->defenfing_country_index=-1;
-                                    (*attack_head)->attack_finished=0;
                                 }
                             }
                             else
@@ -317,6 +316,11 @@ void event_handling(SDL_Event* event, country* country_array, SDL_Point mouse_po
                             fflush(stdin);
                             tmp=tmp->next_attack;
                         }
+                        for (int i=0 ; i<number_of_countries ; i++)
+                        {
+                            printf("number of soldiers in country %d :%d\n", i, country_array[i].number_of_soldiers);
+                            printf("number of soldiers in use in country %d :%d\n", i, country_array[i].soldiers_in_use);
+                        }
                         printf("-----------------------------------------\n");
                         fflush(stdin);
                     }
@@ -358,6 +362,7 @@ void check_mouse_state(SDL_Point mouse_position, country country_array[number_of
                 country_array[i].glow_flag=1;
             else if (country_array[i].color!=unallocated_color && waiting_for_attack==1)
                 country_array[i].glow_flag=1;
+            else country_array[i].glow_flag=0;
         }
         else country_array[i].glow_flag=0;
     }

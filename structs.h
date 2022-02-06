@@ -40,6 +40,6 @@ typedef struct attack
     struct attack* next_attack;
     int maximum_soldiers_in_attack;
     int total_soldiers_in_attack;
-    int attack_finished;
+    // int attack_finished;
 }
 attack;
