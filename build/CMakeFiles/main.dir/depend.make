@@ -7,5 +7,6 @@ CMakeFiles/main.dir/main.c.o: ../helping-functions.h
 CMakeFiles/main.dir/main.c.o: ../include.h
 CMakeFiles/main.dir/main.c.o: ../main.c
 CMakeFiles/main.dir/main.c.o: ../map.h
+CMakeFiles/main.dir/main.c.o: ../menu.h
 CMakeFiles/main.dir/main.c.o: ../structs.h
 

@@ -37,12 +37,16 @@ time.h
 -
 
 /home/pouya/Desktop/BP-Project/main.c
-game.h
-/home/pouya/Desktop/BP-Project/game.h
+menu.h
+/home/pouya/Desktop/BP-Project/menu.h
 
 /home/pouya/Desktop/BP-Project/map.h
 helping-functions.h
 /home/pouya/Desktop/BP-Project/helping-functions.h
+
+/home/pouya/Desktop/BP-Project/menu.h
+game.h
+/home/pouya/Desktop/BP-Project/game.h
 
 /home/pouya/Desktop/BP-Project/structs.h
 include.h
