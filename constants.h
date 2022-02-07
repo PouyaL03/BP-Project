@@ -14,8 +14,8 @@ const int FPS=24;
 int waiting_for_attack=0;
 double initial_speed_of_players=10;
 /*space_between_two_soldiers=4*initial_speed_of_players*/
-double space_between_two_soldiers=50;
-double initial_distance_between_players=50;
+double space_between_two_soldiers=40;
+double initial_distance_between_players=40;
 
 // double speed_of_generation= ;
 double speed_of_soldiers;

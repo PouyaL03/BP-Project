@@ -1,40 +1,17 @@
 #include "map.h"
 
 /*function prototypes*/
-void start_game();
+void start_game(SDL_Renderer*, TTF_Font*, TTF_Font*, country*);
 void AI(country*, attack**);
 void AI_attack(country*, attack**, int, int);
 
-void start_game()
+void start_game(SDL_Renderer* renderer, TTF_Font* font,TTF_Font* bold_font, country* country_array)
 {
-    /*initializing graphic system*/
-    SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER);
-    /*initializinig the windows*/
-    Uint32 window_flags=SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
-    SDL_Window* window= SDL_CreateWindow("Initial window",
-                                        SDL_WINDOWPOS_UNDEFINED,
-                                        SDL_WINDOWPOS_UNDEFINED, 
-                                        window_width, window_height, 
-                                        window_flags);
-    /*creating the renderer*/
-    Uint32 render_flags=SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, render_flags);
-    /*opening the font*/
-    TTF_Init();
-    TTF_Font* font=TTF_OpenFont("../fonts/TNR.ttf", 26);
-    TTF_Font* bold_font=TTF_OpenFont("../fonts/TNR_B.ttf", 24);
     /*setting background color*/
     SDL_SetRenderDrawColor(renderer, colors[7].r, colors[7].g, colors[7].b, 255);
-
     SDL_Point mouse_position;
-
     int close_requested=0;
     int total_frames=0;
-    /*initializing countries*/
-    country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row];
-    create_random_map(all_countries);
-    country country_array[number_of_countries];
-    initialize_country_array(country_array, all_countries);
     attack* attack_head=NULL;
     /*------------------------------------------------------------------------------------*/
     while (!close_requested)
@@ -56,10 +33,6 @@ void start_game()
         SDL_Delay(1000/FPS);
         total_frames++;
     }
-    // clean up resources before exiting
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
     return;
 }
 
@@ -109,7 +82,7 @@ void AI(country* country_array, attack** attack_head)
             if (country_array[defending_country_index].color==country_array[attacking_country_index].color) continue;
             if (country_array[defending_country_index].color==no_player_color)
             {
-                if (rand()%20000==0)
+                if (rand()%10000==0)
                 {
                     if (country_array[attacking_country_index].number_of_soldiers>country_array[defending_country_index].number_of_soldiers)
                     {
@@ -119,7 +92,7 @@ void AI(country* country_array, attack** attack_head)
             }
             else
             {
-                if (rand()%20000==0)
+                if (rand()%10000==0)
                 {
                     if (country_array[attacking_country_index].number_of_soldiers>country_array[defending_country_index].number_of_soldiers)
                     {

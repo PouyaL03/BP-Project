@@ -13,50 +13,47 @@ void update_attacking_soldiers_position(country*, attack**, int);
 void check_for_collisions(attack**, country*);
 void initialize_soldiers(attack**, country*);
 void update_attack_head(attack**);
+void check_if_attack_is_empty(attack**);
+
+void check_if_attack_is_empty(attack** attack_head)
+{
+    attack* garbage;
+    if ((*attack_head)==NULL) return;
+    if ((*attack_head)->next_attack==NULL && (*attack_head)->soldier_head==NULL)
+    {
+        garbage=(*attack_head);
+        (*attack_head)=(*attack_head)->next_attack;
+        free(garbage);
+        return;
+    }
+    attack* tmp_attack_head=(*attack_head);
+    for ( ; tmp_attack_head!=NULL && tmp_attack_head->next_attack!=NULL ; tmp_attack_head=tmp_attack_head->next_attack)
+    {
+        if (tmp_attack_head->next_attack->soldier_head==NULL)
+        {
+            garbage=tmp_attack_head->next_attack;
+            tmp_attack_head->next_attack=tmp_attack_head->next_attack->next_attack;
+            free(garbage);
+        }
+    }
+    return;
+}
 
 void check_for_collisions(attack** attack_head, country* country_array)
 {
     attack* tmp_attack_head=(*attack_head);
     for ( ; tmp_attack_head!=NULL ; tmp_attack_head=tmp_attack_head->next_attack)
     {
+        check_if_attack_is_empty(attack_head);
         if (tmp_attack_head->attack_complete==0) continue;
-        if (tmp_attack_head->next_attack!=NULL)
-        {
-            if (tmp_attack_head->next_attack->soldier_head==NULL)
-            {
-                tmp_attack_head->next_attack=tmp_attack_head->next_attack->next_attack;
-            }
-        }
-        else if (tmp_attack_head->next_attack==NULL)
-        {
-            if (tmp_attack_head->soldier_head==NULL)
-            {
-                tmp_attack_head=NULL;
-                break;
-            }
-        }
         soldier* tmp_soldier_head=tmp_attack_head->soldier_head;
         if (tmp_soldier_head==NULL) continue;
         attack* second_tmp_attack_head=(*attack_head);
         for ( ; second_tmp_attack_head!=NULL ; second_tmp_attack_head=second_tmp_attack_head->next_attack)
         {
+            check_if_attack_is_empty(attack_head);
             if (second_tmp_attack_head==tmp_attack_head) continue;
             if (second_tmp_attack_head->attack_complete==0) continue;
-            if (second_tmp_attack_head->next_attack!=NULL)
-            {
-                if (second_tmp_attack_head->next_attack->soldier_head==NULL)
-                {
-                    second_tmp_attack_head->next_attack=second_tmp_attack_head->next_attack->next_attack;
-                }
-            }
-            else if (second_tmp_attack_head->next_attack==NULL)
-            {
-                if (second_tmp_attack_head->soldier_head==NULL)
-                {
-                    second_tmp_attack_head=NULL;
-                    break;
-                }
-            }
             soldier* second_tmp_soldier_head=second_tmp_attack_head->soldier_head;
             if (second_tmp_soldier_head==NULL) continue;
             if (tmp_attack_head->soldier_head==NULL) continue;

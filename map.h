@@ -78,6 +78,14 @@ void draw_map(SDL_Renderer* renderer, country all_countries[number_of_countries]
     {
         Uint8 alpha=255;
         int which_color=all_countries[i].color;
+        // if (which_color!=unallocated_color && which_color!=no_player_color)
+        // {
+        //     if (all_countries[i].number_of_soldiers+all_countries[i].soldiers_in_use<=maximum_number_of_soldiers)
+        //     {
+        //         alpha=55+200*((all_countries[i].soldiers_in_use+all_countries[i].number_of_soldiers))/maximum_number_of_soldiers;
+        //     }
+        // }
+        // else alpha=100;
         draw_hexagon_borderline(renderer, all_countries[i].x_center,
                                 all_countries[i].y_center,
                                 initial_side_length,
