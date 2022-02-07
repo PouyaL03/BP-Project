@@ -8,7 +8,7 @@ void initialize_country_array(country country_array[number_of_countries],
 void check_mouse_state(SDL_Point, country*, double);
 void update_number_of_soldiers(country*, int);
 int find_country_index(country*, SDL_Point, double);
-void event_handling(SDL_Event*, country*, SDL_Point, int*, attack**);
+int event_handling(SDL_Event*, country*, SDL_Point, attack**);
 void update_attacking_soldiers_position(country*, attack**, int);
 void check_for_collisions(attack**, country*);
 void initialize_soldiers(attack**, country*);
@@ -213,11 +213,11 @@ void update_attacking_soldiers_position(country* country_array, attack** attack_
             tmp_soldier_head->soldier_position_y+=initial_speed_of_players*sinus;
             if ((tmp_soldier_head->soldier_position_x-attacking_x)*(tmp_soldier_head->soldier_position_x-attacking_x)+
                 (tmp_soldier_head->soldier_position_y-attacking_y)*(tmp_soldier_head->soldier_position_y-attacking_y)<
-                space_between_two_soldiers*space_between_two_soldiers)
+                initial_distance_between_players*initial_distance_between_players)
                 break;
             if ((tmp_soldier_head->soldier_position_x-attacking_x)*(tmp_soldier_head->soldier_position_x-attacking_x)+
                 (tmp_soldier_head->soldier_position_y-attacking_y)*(tmp_soldier_head->soldier_position_y-attacking_y)>
-                space_between_two_soldiers*space_between_two_soldiers)
+                initial_distance_between_players*initial_distance_between_players)
             {
                 if (!(tmp_soldier_head->already_counted))
                 {
@@ -235,95 +235,94 @@ void update_attacking_soldiers_position(country* country_array, attack** attack_
     }
 }
 
-void event_handling(SDL_Event* event, country* country_array, SDL_Point mouse_position, int* close_requested, attack** attack_head)
+int event_handling(SDL_Event* event, country* country_array, SDL_Point mouse_position, attack** attack_head)
 {
     while(SDL_PollEvent(event))
+    {
+        switch (event->type)
         {
-            switch (event->type)
-            {
-                case (SDL_QUIT):
-                    printf("khaste nabashid.\n");
-                    fflush(stdin);
-                    *close_requested=1;
-                    break;
-                case (SDL_MOUSEBUTTONDOWN):
-                    if (event->button.button==SDL_BUTTON_LEFT)
-                    {
-                        int which_country=find_country_index(country_array, mouse_position, initial_side_length*sin(teta));
-                        if (which_country!=-1)
-                        {    
-                            if (waiting_for_attack==0)
+            case (SDL_QUIT):
+                return 1;
+                break;
+            case (SDL_MOUSEBUTTONDOWN):
+                if (event->button.button==SDL_BUTTON_LEFT)
+                {
+                    int which_country=find_country_index(country_array, mouse_position, initial_side_length*sin(teta));
+                    if (which_country!=-1)
+                    {    
+                        if (waiting_for_attack==0)
+                        {
+                            if (country_array[which_country].color==blue)
                             {
-                                if (country_array[which_country].color==blue)
+                                waiting_for_attack=1;
+                                attack* tmp=malloc(sizeof(attack));
+                                if ((*attack_head)==NULL)
                                 {
-                                    waiting_for_attack=1;
-                                    attack* tmp=malloc(sizeof(attack));
-                                    if ((*attack_head)==NULL)
-                                    {
-                                        (*attack_head)=tmp;
-                                        (*attack_head)->next_attack=NULL;
-                                    }
-                                    else
-                                    {
-                                        tmp->next_attack=(*attack_head);
-                                        (*attack_head)=tmp;
-                                    }
-                                    (*attack_head)->attacking_country_index=which_country;
-                                    (*attack_head)->attack_complete=0;
-                                    (*attack_head)->defenfing_country_index=-1;
+                                    (*attack_head)=tmp;
+                                    (*attack_head)->next_attack=NULL;
                                 }
-                            }
-                            else
-                            {
-                                if (which_country!=-1 && country_array[which_country].color!=unallocated_color && which_country!=(*attack_head)->attacking_country_index)
+                                else
                                 {
-                                    waiting_for_attack=0;
-                                    (*attack_head)->attack_complete=1;
-                                    (*attack_head)->defenfing_country_index=which_country;
-                                    int tmp_maximum_soldiers_in_attack=country_array[(*attack_head)->attacking_country_index].number_of_soldiers-
-                                                                   country_array[(*attack_head)->attacking_country_index].soldiers_in_use;
-                                    (*attack_head)->soldier_head=(soldier*)malloc(sizeof(soldier));
-                                    initialize_soldiers(attack_head, country_array);
-                                    country_array[(*attack_head)->attacking_country_index].soldiers_in_use+=country_array[(*attack_head)->attacking_country_index].number_of_soldiers;
-                                    country_array[(*attack_head)->attacking_country_index].number_of_soldiers=0;
+                                    tmp->next_attack=(*attack_head);
+                                    (*attack_head)=tmp;
                                 }
+                                (*attack_head)->attacking_country_index=which_country;
+                                (*attack_head)->attack_complete=0;
+                                (*attack_head)->defenfing_country_index=-1;
                             }
                         }
-                    }
-                    else if (event->button.button==SDL_BUTTON_RIGHT)
-                    {
-                        if ((*attack_head)!=NULL)
+                        else
                         {
-                            if ((*attack_head)->attack_complete==0)
+                            if (which_country!=-1 && country_array[which_country].color!=unallocated_color && which_country!=(*attack_head)->attacking_country_index)
                             {
                                 waiting_for_attack=0;
-                                (*attack_head)=(*attack_head)->next_attack;
+                                (*attack_head)->attack_complete=1;
+                                (*attack_head)->defenfing_country_index=which_country;
+                                int tmp_maximum_soldiers_in_attack=country_array[(*attack_head)->attacking_country_index].number_of_soldiers-
+                                                                country_array[(*attack_head)->attacking_country_index].soldiers_in_use;
+                                (*attack_head)->soldier_head=(soldier*)malloc(sizeof(soldier));
+                                initialize_soldiers(attack_head, country_array);
+                                country_array[(*attack_head)->attacking_country_index].soldiers_in_use+=country_array[(*attack_head)->attacking_country_index].number_of_soldiers;
+                                country_array[(*attack_head)->attacking_country_index].number_of_soldiers=0;
                             }
                         }
                     }
-                    /*for debugging purposes*/
-                    else if (event->button.button==SDL_BUTTON_MIDDLE)
+                }
+                else if (event->button.button==SDL_BUTTON_RIGHT)
+                {
+                    if ((*attack_head)!=NULL)
                     {
-                        attack* tmp;
-                        tmp=(*attack_head);
-                        while(tmp!=NULL)
+                        if ((*attack_head)->attack_complete==0)
                         {
-                            printf("attacking country is:%d\n", tmp->attacking_country_index);
-                            printf("defending country is:%d\n", tmp->defenfing_country_index);
-                            fflush(stdin);
-                            tmp=tmp->next_attack;
+                            waiting_for_attack=0;
+                            (*attack_head)=(*attack_head)->next_attack;
                         }
-                        for (int i=0 ; i<number_of_countries ; i++)
-                        {
-                            printf("number of soldiers in country %d :%d\n", i, country_array[i].number_of_soldiers);
-                            printf("number of soldiers in use in country %d :%d\n", i, country_array[i].soldiers_in_use);
-                        }
-                        printf("-----------------------------------------\n");
-                        fflush(stdin);
                     }
-                    break;
-            }
+                }
+                /*for debugging purposes*/
+                else if (event->button.button==SDL_BUTTON_MIDDLE)
+                {
+                    attack* tmp;
+                    tmp=(*attack_head);
+                    while(tmp!=NULL)
+                    {
+                        printf("attacking country is:%d\n", tmp->attacking_country_index);
+                        printf("defending country is:%d\n", tmp->defenfing_country_index);
+                        fflush(stdin);
+                        tmp=tmp->next_attack;
+                    }
+                    for (int i=0 ; i<number_of_countries ; i++)
+                    {
+                        printf("number of soldiers in country %d :%d\n", i, country_array[i].number_of_soldiers);
+                        printf("number of soldiers in use in country %d :%d\n", i, country_array[i].soldiers_in_use);
+                    }
+                    printf("-----------------------------------------\n");
+                    fflush(stdin);
+                }
+                break;
         }
+    }
+    return 0;
 }
 
 int find_country_index(country* country_array, SDL_Point mouse_position, double check_radius)
