@@ -1,6 +1,7 @@
 #include "menu.h"
 /*function prototypes*/
 void main_menu(SDL_Renderer*, TTF_Font*, TTF_Font*);
+void SDL_DestroyEverything_main_menu(SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**);
 
 int main()
 {
@@ -21,12 +22,12 @@ int main()
     TTF_Font* font=TTF_OpenFont("../fonts/TNR.ttf", 26);
     TTF_Font* bold_font=TTF_OpenFont("../fonts/TNR_B.ttf", 24);
     /*initializing countries*/
-    country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row];
-    create_random_map(all_countries);
-    country country_array[number_of_countries];
-    initialize_country_array(country_array, all_countries);
+    // country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row];
+    // create_random_map(all_countries);
+    // country country_array[number_of_countries];
+    // initialize_country_array(country_array, all_countries);
     main_menu(renderer, font, bold_font);
-    start_game(renderer, font, bold_font, country_array);
+    // start_game(renderer, font, bold_font, country_array);
     // clean up resources before exiting
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -39,7 +40,6 @@ int main()
 
 void main_menu(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* bold_font)
 {
-    button_width=window_width/3;
     SDL_Event event;
     SDL_Point mouse_position;
     /*initializing window background and buttons*/
@@ -120,42 +120,55 @@ void main_menu(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* bold_font)
     TTF_CloseFont(state_io_text_font);
     TTF_CloseFont(button_text_font);
     TTF_CloseFont(description_font);
-    while(1)
+    int close_requested=0;
+    while(!close_requested)
     {
+        SDL_RenderClear(renderer);
+        SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
         while(SDL_PollEvent(&event))
         {
-            SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
             switch(event.type)
             {
                 case (SDL_QUIT):
-                    SDL_DestroyTexture(background_texture);
-                    SDL_DestroyTexture(button_texture);
-                    SDL_DestroyTexture(texture_state_io);
-                    SDL_DestroyTexture(new_game_text_texture);
-                    SDL_DestroyTexture(resume_game_text_texture);
-                    SDL_DestroyTexture(scoreboard_text_texture);
-                    SDL_DestroyTexture(description_text_texture);
+                    SDL_DestroyEverything_main_menu(&background_texture, &button_texture, &texture_state_io, &new_game_text_texture, &resume_game_text_texture, &scoreboard_text_texture, &description_text_texture);
                     return;
                 case (SDL_MOUSEBUTTONDOWN):
+                    if (event.button.button!=SDL_BUTTON_LEFT) break;
                     if (mouse_position.x > new_game_button_rect.x && mouse_position.x < new_game_button_rect.x + new_game_button_rect.w &&
                         mouse_position.y > new_game_button_rect.y && mouse_position.y < new_game_button_rect.y + new_game_button_rect.h)
                         {
-                            printf("trying to open new game menu.\n");
-                            SDL_RenderClear(renderer);
-                            new_game_menu(renderer, background_texture, button_texture, font, bold_font, background_rect);
+                            switch(new_game_menu(renderer, background_texture, button_texture, font, bold_font, background_rect, button_textColor))
+                            {
+                                case (game_quit):
+                                    close_requested=1;
+                                    break;
+                                case (game_finished):
+                                    break;
+                            }
                         }
                     else if (mouse_position.x > resume_game_button_rect.x && mouse_position.x < resume_game_button_rect.x + resume_game_button_rect.w &&
                              mouse_position.y > resume_game_button_rect.y && mouse_position.y < resume_game_button_rect.y + resume_game_button_rect.h)
                         {
-                            printf("trying to resume game for you.\n");
-                            SDL_RenderClear(renderer);
-                            resume_game(renderer, background_texture, button_texture, font, bold_font, background_rect);
+                            switch(resume_game(renderer, background_texture, button_texture, font, bold_font, background_rect))
+                            {
+                                case (game_quit):
+                                    close_requested=1;
+                                    break;
+                            }
+                        }
+                    else if (mouse_position.x > scoreboard_button_rect.x && mouse_position.x < scoreboard_button_rect.x + scoreboard_button_rect.w &&
+                             mouse_position.y > scoreboard_button_rect.y && mouse_position.x < scoreboard_button_rect.y + scoreboard_button_rect.h)
+                        {
+                            switch(view_scoreboard(renderer, background_texture, button_texture, font, bold_font, background_rect))
+                            {
+                                case (game_quit):
+                                    close_requested=1;
+                                    break;
+                            }
                         }
                     break;
             }
         }
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
-        SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background_texture, NULL, &background_rect);
         SDL_RenderCopy(renderer, button_texture, NULL, &new_game_button_rect);
         SDL_RenderCopy(renderer, button_texture, NULL, &resume_game_button_rect);
@@ -168,13 +181,18 @@ void main_menu(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* bold_font)
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);
     }
-    SDL_DestroyTexture(background_texture);
-    SDL_DestroyTexture(button_texture);
-    SDL_DestroyTexture(texture_state_io);
-    SDL_DestroyTexture(new_game_text_texture);
-    SDL_DestroyTexture(resume_game_text_texture);
-    SDL_DestroyTexture(scoreboard_text_texture);
-    SDL_DestroyTexture(description_text_texture);
+    SDL_DestroyEverything_main_menu(&background_texture, &button_texture, &texture_state_io, &new_game_text_texture, &resume_game_text_texture, &scoreboard_text_texture, &description_text_texture);
+}
+
+void SDL_DestroyEverything_main_menu(SDL_Texture** texture1, SDL_Texture** texture2, SDL_Texture** texture3, SDL_Texture** texture4, SDL_Texture** texture5, SDL_Texture** texture6, SDL_Texture** texture7)
+{
+    SDL_DestroyTexture(*texture1);
+    SDL_DestroyTexture(*texture2);
+    SDL_DestroyTexture(*texture3);
+    SDL_DestroyTexture(*texture4);
+    SDL_DestroyTexture(*texture5);
+    SDL_DestroyTexture(*texture6);
+    SDL_DestroyTexture(*texture7);
 }
 /*
     SDL_Rect rectangle;

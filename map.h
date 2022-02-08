@@ -1,9 +1,9 @@
 #include "helping-functions.h"
 
 /*function prototypes*/
-void draw_map(SDL_Renderer*, country all_countries[number_of_countries], TTF_Font*, TTF_Font*, attack**);
+void draw_map(SDL_Renderer*, country*, TTF_Font*, TTF_Font*, attack**);
 void create_random_map(country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row]);
-void show_number_of_soldiers(SDL_Renderer*, int, int, int, TTF_Font*);
+void show_number_of_soldiers(SDL_Renderer*, int, int, int, TTF_Font*, country*, int);
 void show_line(SDL_Renderer*, TTF_Font*);
 void show_attacking_soldiers(SDL_Renderer*, country*, attack**);
 
@@ -68,11 +68,12 @@ void create_random_map(country all_countries[number_of_hexagons_in_column][numbe
                 all_countries[i][j].number_of_soldiers=20+rand()%5;
             }
             else all_countries[i][j].number_of_soldiers=10+rand()%4;
+            number_of_countries++;
         }
     }
 }
 
-void draw_map(SDL_Renderer* renderer, country all_countries[number_of_countries], TTF_Font* bold_font, TTF_Font* font, attack** attack_head)
+void draw_map(SDL_Renderer* renderer, country* all_countries, TTF_Font* bold_font, TTF_Font* font, attack** attack_head)
 {
     for (int i=0 ; i<number_of_countries ; i++)
     {
@@ -105,7 +106,7 @@ void draw_map(SDL_Renderer* renderer, country all_countries[number_of_countries]
         int number_of_soldiers=all_countries[i].number_of_soldiers+all_countries[i].soldiers_in_use;
         int x_corner_rect=all_countries[i].x_center;
         int y_corner_rect=all_countries[i].y_center+radius_of_circle;
-        if(all_countries[i].color!=unallocated_color) show_number_of_soldiers(renderer, x_corner_rect, y_corner_rect, number_of_soldiers, bold_font);
+        if(all_countries[i].color!=unallocated_color) show_number_of_soldiers(renderer, x_corner_rect, y_corner_rect, number_of_soldiers, bold_font, all_countries, i);
     }
     /*for glowing*/
     for (int i=0 ; i<number_of_countries ; i++)
@@ -144,12 +145,20 @@ void show_line(SDL_Renderer* renderer, TTF_Font* font)
     SDL_DestroyTexture(texture);
 }
 
-void show_number_of_soldiers(SDL_Renderer* renderer, int x_corner, int y_corner, int number_of_soldiers, TTF_Font* font)
+void show_number_of_soldiers(SDL_Renderer* renderer, int x_corner, int y_corner, int number_of_soldiers, TTF_Font* font, country* country_array, int country_index)
 {
     int tmp_number_of_soldiers=number_of_soldiers;
     int check_for_positive_value=0;
     if (number_of_soldiers<0)
     {
+        if (country_array[country_index].number_of_soldiers<0)
+        {
+            country_array[country_index].number_of_soldiers=0;
+        }
+        if (country_array[country_index].soldiers_in_use<0)
+        {
+            country_array[country_index].soldiers_in_use=0;
+        }
         printf("number of players is lower than 0\n");
         fflush(stdin);
         check_for_positive_value=1;

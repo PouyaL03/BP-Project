@@ -1,9 +1,12 @@
 #include "structs.h"
+char player_name[100];
 #define window_width 1280
 #define window_height 960
+#define button_width window_width/3
+#define button_height 100
 #define number_of_hexagons_in_row 7
 #define number_of_hexagons_in_column 5
-#define number_of_countries 35
+int number_of_countries=0;
 double initial_side_length=70;
 double radius_of_circle=20;
 const int FPS=24;
@@ -12,14 +15,10 @@ const int FPS=24;
 #define teta pi/3
 #define maximum_number_of_soldiers 90
 int waiting_for_attack=0;
-double initial_speed_of_players=10;
+double initial_speed_of_players=7;
 /*space_between_two_soldiers=4*initial_speed_of_players*/
 double space_between_two_soldiers=60;
 double initial_distance_between_players=40;
-
-/*for buttons*/
-int button_width;
-int button_height=100;
 
 const int shadow_alpha=127;
 
@@ -59,3 +58,5 @@ SDL_Color dark_colors[number_of_colors]=
     {255, 255, 255, 255},
     {}
 };
+
+enum logic_return_type{game_quit, previous_page, nothing, game_finished};

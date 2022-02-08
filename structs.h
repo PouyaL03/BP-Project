@@ -43,3 +43,13 @@ typedef struct attack
     // int attack_finished;
 }
 attack;
+
+typedef struct map
+{
+    SDL_Surface* text_surface;
+    SDL_Texture* text_texture;
+    SDL_Rect button_rect;
+    SDL_Rect text_rect;
+    char name[10];
+}
+map;

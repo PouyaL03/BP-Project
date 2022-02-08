@@ -1,11 +1,11 @@
 #include "map.h"
 
 /*function prototypes*/
-void start_game(SDL_Renderer*, TTF_Font*, TTF_Font*, country*);
+int start_game(SDL_Renderer*, TTF_Font*, TTF_Font*, country*);
 void AI(country*, attack**);
 void AI_attack(country*, attack**, int, int);
 
-void start_game(SDL_Renderer* renderer, TTF_Font* font,TTF_Font* bold_font, country* country_array)
+int start_game(SDL_Renderer* renderer, TTF_Font* font,TTF_Font* bold_font, country* country_array)
 {
     /*setting background color*/
     SDL_SetRenderDrawColor(renderer, colors[7].r, colors[7].g, colors[7].b, 255);
@@ -16,7 +16,11 @@ void start_game(SDL_Renderer* renderer, TTF_Font* font,TTF_Font* bold_font, coun
     while (1)
     {
         SDL_Event event;
-        if(event_handling(&event, country_array, mouse_position, &attack_head)) break;
+        switch(event_handling(&event, country_array, mouse_position, &attack_head))
+        {
+            case(game_quit):
+                return game_quit;
+        }
         update_number_of_soldiers(country_array, total_frames);
         SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
         check_mouse_state(mouse_position, country_array, initial_side_length*sin(teta));
@@ -32,12 +36,11 @@ void start_game(SDL_Renderer* renderer, TTF_Font* font,TTF_Font* bold_font, coun
         SDL_Delay(1000/FPS);
         total_frames++;
     }
-    return;
+    return game_finished;
 }
 
 void AI_attack(country* country_array, attack** attack_head, int attacker, int defender)
 {
-    printf("started AI attack.\n");
     if (*attack_head==NULL)
     {
         (*attack_head)=malloc(sizeof(attack));
@@ -67,12 +70,10 @@ void AI_attack(country* country_array, attack** attack_head, int attacker, int d
         country_array[attacker].soldiers_in_use+=country_array[attacker].number_of_soldiers;
         country_array[attacker].number_of_soldiers=0;
     }
-    printf("ended AI attack.\n");
 }
 
 void AI(country* country_array, attack** attack_head)
 {
-    printf("started AI.\n");
     for (int attacking_country_index=0 ; attacking_country_index<number_of_countries ; attacking_country_index++)
     {
         if (country_array[attacking_country_index].color==blue || country_array[attacking_country_index].color==unallocated_color || country_array[attacking_country_index].color==no_player_color) continue;
@@ -84,7 +85,7 @@ void AI(country* country_array, attack** attack_head)
             if (country_array[defending_country_index].color==country_array[attacking_country_index].color) continue;
             if (country_array[defending_country_index].color==no_player_color)
             {
-                if (rand()%10000==0)
+                if (rand()%15000==0)
                 {
                     if (country_array[attacking_country_index].number_of_soldiers>country_array[defending_country_index].number_of_soldiers)
                     {
@@ -94,7 +95,7 @@ void AI(country* country_array, attack** attack_head)
             }
             else
             {
-                if (rand()%10000==0)
+                if (rand()%15000==0)
                 {
                     if (country_array[attacking_country_index].number_of_soldiers>country_array[defending_country_index].number_of_soldiers)
                     {
@@ -104,7 +105,6 @@ void AI(country* country_array, attack** attack_head)
             }
         }
     }
-    printf("ended AI.\n");
 }
     // /*select color of background*/
     // SDL_Surface* surface = IMG_Load("../images/sample-picture.png");

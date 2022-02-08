@@ -242,7 +242,7 @@ int event_handling(SDL_Event* event, country* country_array, SDL_Point mouse_pos
         switch (event->type)
         {
             case (SDL_QUIT):
-                return 1;
+                return game_quit;
                 break;
             case (SDL_MOUSEBUTTONDOWN):
                 if (event->button.button==SDL_BUTTON_LEFT)
@@ -322,7 +322,7 @@ int event_handling(SDL_Event* event, country* country_array, SDL_Point mouse_pos
                 break;
         }
     }
-    return 0;
+    return nothing;
 }
 
 int find_country_index(country* country_array, SDL_Point mouse_position, double check_radius)
