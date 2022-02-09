@@ -7,6 +7,7 @@ char player_name[100];
 #define number_of_hexagons_in_row 7
 #define number_of_hexagons_in_column 5
 int number_of_countries=0;
+#define maximum_number_of_countries 35
 double initial_side_length=70;
 double radius_of_circle=20;
 const int FPS=24;

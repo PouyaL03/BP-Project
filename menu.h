@@ -9,13 +9,13 @@ int choose_map(SDL_Renderer*, SDL_Texture*, SDL_Texture*, TTF_Font*, TTF_Font*, 
 void SDL_DestroyEverything_new_game_menu(SDL_Texture**, SDL_Texture**, TTF_Font**);
 void SDL_DestroyEverything_resume_game_menu();
 void SDL_DestroyEverything_view_scoreboard();
-void SDL_DestroyEverything_choose_map();
+void SDL_DestroyEverything_choose_map(map*, int, TTF_Font**);
 
 int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* button_texture, TTF_Font* font, TTF_Font* bold_font, SDL_Rect background_rect, SDL_Color button_textColor)
 {
     SDL_Event event;
     SDL_Point mouse_position;
-    TTF_Font* button_text_font=TTF_OpenFont("../fonts/TNR_B.ttf", 40);
+    TTF_Font* button_text_font = TTF_OpenFont("../fonts/TNR_B.ttf", 40);
     FILE* number_of_maps_file = fopen("../maps/number_of_maps.dat", "r");
     int number_of_maps;
     fread(&number_of_maps, sizeof(int), 1, number_of_maps_file);
@@ -55,10 +55,39 @@ int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Text
             {
                 case (SDL_QUIT):
                     close_requested=1;
-                    SDL_DestroyEverything_choose_map();
+                    SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font);
                     return game_quit;
                 case (SDL_MOUSEBUTTONDOWN):
                     if (event.button.button!=SDL_BUTTON_LEFT) break;
+                    for (int i=0 ; i<number_of_maps ; i++)
+                    {
+                        if (mouse_position.x > all_maps[i].button_rect.x && mouse_position.x < all_maps[i].button_rect.x + all_maps[i].button_rect.w &&
+                            mouse_position.y > all_maps[i].button_rect.y && mouse_position.y < all_maps[i].button_rect.y + all_maps[i].button_rect.h)
+                            {
+                                country country_array[maximum_number_of_countries];
+                                unsigned char file_name[30];
+                                sprintf(file_name, "../maps/map_data/");
+                                if(i!=0) sprintf(file_name+strlen(file_name), all_maps[i].name);
+                                else sprintf(file_name+strlen(file_name), "MAP0");
+                                sprintf(file_name+strlen(file_name), ".dat");
+                                printf("%s\n", file_name);
+                                printf("hello darling.\n");
+                                FILE* map_file=fopen(file_name, "r");
+                                number_of_countries=fread(country_array, sizeof(country), maximum_number_of_countries, map_file);
+                                fclose(map_file);
+                                printf("marg bar america.\n");
+                                switch(start_game(renderer, font, bold_font, country_array))
+                                {
+                                    case(game_quit):
+                                        SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font);
+                                        return game_quit;
+                                    case(game_finished):
+                                        SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font);
+                                        return game_finished;
+                                }
+                                break;
+                            }
+                    }
             }
         }
         SDL_RenderCopy(renderer, background_texture, NULL, &background_rect);
@@ -70,7 +99,7 @@ int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Text
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);
     }
-    SDL_DestroyEverything_choose_map();
+    SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font);
     return nothing;
 }
 
@@ -214,9 +243,14 @@ void SDL_DestroyEverything_new_game_menu(SDL_Texture** texture1, SDL_Texture** t
     TTF_CloseFont(*font1);
 }
 
-void SDL_DestroyEverything_choose_map()
+void SDL_DestroyEverything_choose_map(map* all_maps, int number_of_maps, TTF_Font** font1)
 {
-
+    for (int i=0 ; i<number_of_maps ; i++)
+    {
+        SDL_DestroyTexture(all_maps[i].text_texture);
+        SDL_FreeSurface(all_maps[i].text_surface);
+    }
+    TTF_CloseFont(*font1);
 }
 /*
     //initializing countires

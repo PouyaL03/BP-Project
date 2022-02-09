@@ -159,8 +159,6 @@ void show_number_of_soldiers(SDL_Renderer* renderer, int x_corner, int y_corner,
         {
             country_array[country_index].soldiers_in_use=0;
         }
-        printf("number of players is lower than 0\n");
-        fflush(stdin);
         check_for_positive_value=1;
     }
     SDL_Rect rectangle;

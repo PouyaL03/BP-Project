@@ -5,5 +5,6 @@
 #include <SDL2/SDL_ttf.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <string.h>
