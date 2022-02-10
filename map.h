@@ -110,7 +110,7 @@ void draw_map(SDL_Renderer* renderer, country* all_countries, TTF_Font* bold_fon
             {
                 for (int j=0 ; j<number_of_potions ; j++)
                 {
-                    if (all_colors_potion[potion_on_screen].type[j]==1)
+                    if (all_colors_potion[which_color].type[j]==1)
                     {
                         draw_potion(renderer, all_countries[i].x_center,
                                               all_countries[i].y_center, 255, j, initial_side_length/2.8);

@@ -120,11 +120,9 @@ int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Re
                                 }
                             }
                             update_username_box(renderer, &username_text_surface, &username_text_texture, &username_text_rect, temp_username, username_font, username_color, enter_rect);
-                            printf("%s\n", temp_username);
                             break;
                         case (SDLK_RETURN):
                             find_user(temp_username);
-                            printf("%s\t%d\n", main_user.username, main_user.score);
                             return nothing;
                     }
                     break;
@@ -183,10 +181,6 @@ void find_user(char* input_username)
         users_file=fopen("../users_database/users.dat", "r");
         fread(all_users, sizeof(user), number_of_users, users_file);
         fclose(users_file);
-        for (int i=0 ; i<number_of_users ; i++)
-        {
-            printf("%s\t%d\n", all_users[i].username, all_users[i].score);
-        }
         for (int i=0 ; i<number_of_users ; i++)
         {
             if (strcmp(all_users[i].username, input_username)==0)

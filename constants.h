@@ -76,3 +76,5 @@ SDL_Color dark_colors[number_of_colors]=
 };
 
 enum logic_return_type{game_quit, previous_page, nothing, game_finished};
+
+enum win_lose{win, lose, continue_game};
