@@ -35,7 +35,7 @@ int start_game(SDL_Renderer* renderer, TTF_Font* font,TTF_Font* bold_font, count
             case(game_quit):
                 return game_quit;
         }
-        update_number_of_soldiers(country_array, total_frames);
+        update_number_of_soldiers(country_array, total_frames, all_colors_potion);
         SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
         check_mouse_state(mouse_position, country_array, initial_side_length*sin(teta));
         SDL_SetRenderDrawColor(renderer,
@@ -45,7 +45,7 @@ int start_game(SDL_Renderer* renderer, TTF_Font* font,TTF_Font* bold_font, count
         SDL_RenderClear(renderer);
         update_attacking_soldiers_position(country_array, &attack_head, total_frames, all_colors_potion);
         potion_logic(country_array, &attack_head, total_frames, &time_to_deploy, all_colors_potion);
-        AI(country_array, &attack_head);
+        // AI(country_array, &attack_head);
         draw_map(renderer, country_array, bold_font, font, &attack_head, all_colors_potion[potion_on_screen]);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);

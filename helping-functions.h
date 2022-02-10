@@ -6,7 +6,7 @@ void draw_hexagon_no_borderline(SDL_Renderer*, double, double, double, int, Uint
 void initialize_country_array(country country_array[number_of_countries],
                               country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row]);
 void check_mouse_state(SDL_Point, country*, double);
-void update_number_of_soldiers(country*, int);
+void update_number_of_soldiers(country*, int, potion*);
 int find_country_index(country*, SDL_Point, double);
 int event_handling(SDL_Event*, country*, SDL_Point, attack**);
 void update_attacking_soldiers_position(country*, attack**, int, potion*);
@@ -35,7 +35,7 @@ void potion_logic(country* country_array, attack** attack_head, int total_frames
                 {
                     if (country_array[i].color!=no_player_color || country_array[j].color!=no_player_color)
                     {
-                        if (rand()%600==0)
+                        if (rand()%50==0)
                         {
                             // printf("marg please.\n");
                             flag=0;
@@ -43,8 +43,7 @@ void potion_logic(country* country_array, attack** attack_head, int total_frames
                             coefficient/=1000;
                             all_colors_potion[potion_on_screen].x_center=country_array[i].x_center+coefficient*(country_array[j].x_center-country_array[i].x_center);
                             all_colors_potion[potion_on_screen].y_center=country_array[i].y_center+coefficient*(country_array[j].y_center-country_array[i].y_center);
-                            int which_potion=rand()%2;
-                            if (which_potion==1) printf("decrease enemy soldiers speed.\n");
+                            int which_potion=rand()%4;
                             for (int i=0 ; i<number_of_potions ; i++)
                             {
                                 all_colors_potion[potion_on_screen].type[i]=0;
@@ -306,13 +305,22 @@ void update_attacking_soldiers_position(country* country_array, attack** attack_
                 }
                 else
                 {
-                    country_array[tmp_attack_head->defenfing_country_index].number_of_soldiers--;
+                    if (all_colors_potion[country_array[tmp_attack_head->defenfing_country_index].color].enable==1 &&
+                        all_colors_potion[country_array[tmp_attack_head->defenfing_country_index].color].type[enemy_soldiers_change_side]==1)
+                        {
+                            country_array[tmp_attack_head->defenfing_country_index].number_of_soldiers+=2;
+                        }
+                    else
+                    {
+                        country_array[tmp_attack_head->defenfing_country_index].number_of_soldiers--;
+                    }
                     soldier* garbage=tmp_soldier_head;
                     tmp_soldier_head=tmp_soldier_head->next_soldier;
                     (tmp_attack_head)->soldier_head=tmp_soldier_head;
                     free(garbage);
                 }
-            }
+      
+                    country_array[tmp_attack_head->defenfing_country_index].number_of_soldiers--;      }
         }
         double coefficient=1;
         if (tmp_soldier_head!=NULL && all_colors_potion[tmp_soldier_head->color].enable==1)
@@ -460,13 +468,17 @@ int find_country_index(country* country_array, SDL_Point mouse_position, double 
     return -1;
 }
 
-void update_number_of_soldiers(country* country_array, int total_frames)
+void update_number_of_soldiers(country* country_array, int total_frames, potion* all_colors_potion)
 {
     for (int i=0 ; i<number_of_countries ; i++)
     {
         if(country_array[i].number_of_soldiers>=maximum_number_of_soldiers) continue;
         if(country_array[i].color==unallocated_color || country_array[i].color==no_player_color) continue;
-        if(total_frames%FPS==0) country_array[i].number_of_soldiers++;
+        if(total_frames%FPS==0)
+        {
+            if (all_colors_potion[country_array[i].color].enable==1 && all_colors_potion[country_array[i].color].type[3]==1) country_array[i].number_of_soldiers+=3;
+            country_array[i].number_of_soldiers++;
+        }
     }
 }
 
