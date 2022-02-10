@@ -1,11 +1,31 @@
 #include "helping-functions.h"
 
 /*function prototypes*/
-void draw_map(SDL_Renderer*, country*, TTF_Font*, TTF_Font*, attack**, potion);
+void draw_map(SDL_Renderer*, country*, TTF_Font*, TTF_Font*, attack**, potion*);
 void create_random_map(country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row]);
 void show_number_of_soldiers(SDL_Renderer*, int, int, int, TTF_Font*, country*, int);
 void show_line(SDL_Renderer*, TTF_Font*);
 void show_attacking_soldiers(SDL_Renderer*, country*, attack**);
+void draw_hexagon_borderline(SDL_Renderer*, double, double, double, int, Uint8);
+void draw_hexagon_no_borderline(SDL_Renderer*, double, double, double, int, Uint8);
+void draw_potion(SDL_Renderer*, double, double, Uint8, int, double);
+
+void draw_potion(SDL_Renderer* renderer, double x_center, double y_center, Uint8 alpha, int which_color, double side_length)
+{
+    Sint16 vx[6];
+    Sint16 vy[6];
+    vx[0]=x_center-side_length*cos(teta); vy[0]=y_center+side_length*sin(teta);
+    vx[1]=x_center+side_length*cos(teta); vy[1]=y_center+side_length*sin(teta);
+    vx[2]=x_center+side_length; vy[2]=y_center;
+    vx[3]=x_center+side_length*cos(teta); vy[3]=y_center-side_length*sin(teta);
+    vx[4]=x_center-side_length*cos(teta); vy[4]=y_center-side_length*sin(teta);
+    vx[5]=x_center-side_length; vy[5]=y_center;
+    filledPolygonRGBA(renderer, vx, vy, 6, potion_colors[which_color].r,
+                                           potion_colors[which_color].g,
+                                           potion_colors[which_color].b,
+                                           alpha);
+    aapolygonRGBA(renderer, vx, vy, 6, 0, 0, 0, alpha);
+}
 
 void show_attacking_soldiers(SDL_Renderer* renderer, country* country_array, attack** attack_head)
 {
@@ -73,7 +93,7 @@ void create_random_map(country all_countries[number_of_hexagons_in_column][numbe
     }
 }
 
-void draw_map(SDL_Renderer* renderer, country* all_countries, TTF_Font* bold_font, TTF_Font* font, attack** attack_head, potion on_screen_potion)
+void draw_map(SDL_Renderer* renderer, country* all_countries, TTF_Font* bold_font, TTF_Font* font, attack** attack_head, potion* all_colors_potion)
 {
     for (int i=0 ; i<number_of_countries ; i++)
     {
@@ -86,14 +106,28 @@ void draw_map(SDL_Renderer* renderer, country* all_countries, TTF_Font* bold_fon
                                 alpha);
         if (which_color!=unallocated_color)
         {
-            filledCircleRGBA(renderer, all_countries[i].x_center,
-                                    all_countries[i].y_center,
-                                    radius_of_circle,
-                                    dark_colors[which_color].r,
-                                    dark_colors[which_color].g,
-                                    dark_colors[which_color].b,
-                                    alpha);
-            aacircleRGBA(renderer, all_countries[i].x_center, all_countries[i].y_center, radius_of_circle, 0, 0, 0, 255);
+            if (all_colors_potion[which_color].enable==1)
+            {
+                for (int j=0 ; j<number_of_potions ; j++)
+                {
+                    if (all_colors_potion[potion_on_screen].type[j]==1)
+                    {
+                        draw_potion(renderer, all_countries[i].x_center,
+                                              all_countries[i].y_center, 255, j, initial_side_length/2.8);
+                    }
+                }
+            }
+            else
+            {
+                filledCircleRGBA(renderer, all_countries[i].x_center,
+                                        all_countries[i].y_center,
+                                        radius_of_circle,
+                                        dark_colors[which_color].r,
+                                        dark_colors[which_color].g,
+                                        dark_colors[which_color].b,
+                                        alpha);
+                aacircleRGBA(renderer, all_countries[i].x_center, all_countries[i].y_center, radius_of_circle, 0, 0, 0, 255);
+            }
         }
         int number_of_soldiers=all_countries[i].number_of_soldiers+all_countries[i].soldiers_in_use;
         int x_corner_rect=all_countries[i].x_center;
@@ -113,9 +147,16 @@ void draw_map(SDL_Renderer* renderer, country* all_countries, TTF_Font* bold_fon
                                               which_color, alpha);
         }
     }
-    if (on_screen_potion.enable==1)
+    if (all_colors_potion[potion_on_screen].enable==1)
     {
-        aacircleRGBA(renderer, on_screen_potion.x_center, on_screen_potion.y_center, 50, 0, 0, 0, 255);
+        for (int j=0 ; j<number_of_potions ; j++)
+        {
+            if (all_colors_potion[potion_on_screen].type[j]==1)
+            {
+                draw_potion(renderer, all_colors_potion[potion_on_screen].x_center,
+                                      all_colors_potion[potion_on_screen].y_center, 255, j, initial_side_length/2);
+            }
+        }
     }
     show_attacking_soldiers(renderer, all_countries, attack_head);
     show_line(renderer, font);
@@ -200,4 +241,37 @@ void show_number_of_soldiers(SDL_Renderer* renderer, int x_corner, int y_corner,
     rectangle.h = text_height;
     SDL_RenderCopy(renderer, texture, NULL, &rectangle);
     SDL_DestroyTexture(texture);
+}
+
+void draw_hexagon_borderline(SDL_Renderer* renderer, double x_center, double y_center, double side_length, int which_color, Uint8 alpha)
+{
+    Sint16 vx[6];
+    Sint16 vy[6];
+    vx[0]=x_center-side_length*cos(teta); vy[0]=y_center+side_length*sin(teta);
+    vx[1]=x_center+side_length*cos(teta); vy[1]=y_center+side_length*sin(teta);
+    vx[2]=x_center+side_length; vy[2]=y_center;
+    vx[3]=x_center+side_length*cos(teta); vy[3]=y_center-side_length*sin(teta);
+    vx[4]=x_center-side_length*cos(teta); vy[4]=y_center-side_length*sin(teta);
+    vx[5]=x_center-side_length; vy[5]=y_center;
+    filledPolygonRGBA(renderer, vx, vy, 6, colors[which_color].r,
+                                           colors[which_color].g,
+                                           colors[which_color].b,
+                                           alpha);
+    aapolygonRGBA(renderer, vx, vy, 6, 0, 0, 0, alpha);
+}
+
+void draw_hexagon_no_borderline(SDL_Renderer* renderer, double x_center, double y_center, double side_length, int which_color, Uint8 alpha)
+{
+    Sint16 vx[6];
+    Sint16 vy[6];
+    vx[0]=x_center-side_length*cos(teta); vy[0]=y_center+side_length*sin(teta);
+    vx[1]=x_center+side_length*cos(teta); vy[1]=y_center+side_length*sin(teta);
+    vx[2]=x_center+side_length; vy[2]=y_center;
+    vx[3]=x_center+side_length*cos(teta); vy[3]=y_center-side_length*sin(teta);
+    vx[4]=x_center-side_length*cos(teta); vy[4]=y_center-side_length*sin(teta);
+    vx[5]=x_center-side_length; vy[5]=y_center;
+    filledPolygonRGBA(renderer, vx, vy, 6, colors[which_color].r,
+                                           colors[which_color].g,
+                                           colors[which_color].b,
+                                           alpha);
 }

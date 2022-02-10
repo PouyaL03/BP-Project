@@ -43,10 +43,10 @@ enum potion_names{increase_soldiers_movement_speed, decrease_enemy_soldiers_move
 
 SDL_Color potion_colors[number_of_potions]=
 {
-    {},
-    {},
-    {},
-    {}
+    {0, 0, 0, 255},
+    {255, 255, 255, 255},
+    {0, 0, 255, 255},
+    {255, 0, 0, 255}
 };
 
 SDL_Color colors[number_of_colors]=

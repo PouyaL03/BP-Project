@@ -45,8 +45,8 @@ int start_game(SDL_Renderer* renderer, TTF_Font* font,TTF_Font* bold_font, count
         SDL_RenderClear(renderer);
         update_attacking_soldiers_position(country_array, &attack_head, total_frames, all_colors_potion);
         potion_logic(country_array, &attack_head, total_frames, &time_to_deploy, all_colors_potion);
-        // AI(country_array, &attack_head);
-        draw_map(renderer, country_array, bold_font, font, &attack_head, all_colors_potion[potion_on_screen]);
+        AI(country_array, &attack_head);
+        draw_map(renderer, country_array, bold_font, font, &attack_head, all_colors_potion);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);
         total_frames++;

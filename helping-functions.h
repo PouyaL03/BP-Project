@@ -1,8 +1,6 @@
 #include "constants.h"
 
 /*function prototypes*/
-void draw_hexagon_borderline(SDL_Renderer*, double, double, double, int, Uint8);
-void draw_hexagon_no_borderline(SDL_Renderer*, double, double, double, int, Uint8);
 void initialize_country_array(country country_array[number_of_countries],
                               country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row]);
 void check_mouse_state(SDL_Point, country*, double);
@@ -35,7 +33,7 @@ void potion_logic(country* country_array, attack** attack_head, int total_frames
                 {
                     if (country_array[i].color!=no_player_color || country_array[j].color!=no_player_color)
                     {
-                        if (rand()%50==0)
+                        if (rand()%500==0)
                         {
                             // printf("marg please.\n");
                             flag=0;
@@ -498,39 +496,6 @@ void check_mouse_state(SDL_Point mouse_position, country country_array[number_of
         }
         else country_array[i].glow_flag=0;
     }
-}
-
-void draw_hexagon_borderline(SDL_Renderer* renderer, double x_center, double y_center, double side_length, int which_color, Uint8 alpha)
-{
-    Sint16 vx[6];
-    Sint16 vy[6];
-    vx[0]=x_center-side_length*cos(teta); vy[0]=y_center+side_length*sin(teta);
-    vx[1]=x_center+side_length*cos(teta); vy[1]=y_center+side_length*sin(teta);
-    vx[2]=x_center+side_length; vy[2]=y_center;
-    vx[3]=x_center+side_length*cos(teta); vy[3]=y_center-side_length*sin(teta);
-    vx[4]=x_center-side_length*cos(teta); vy[4]=y_center-side_length*sin(teta);
-    vx[5]=x_center-side_length; vy[5]=y_center;
-    filledPolygonRGBA(renderer, vx, vy, 6, colors[which_color].r,
-                                           colors[which_color].g,
-                                           colors[which_color].b,
-                                           alpha);
-    aapolygonRGBA(renderer, vx, vy, 6, 0, 0, 0, alpha);
-}
-
-void draw_hexagon_no_borderline(SDL_Renderer* renderer, double x_center, double y_center, double side_length, int which_color, Uint8 alpha)
-{
-    Sint16 vx[6];
-    Sint16 vy[6];
-    vx[0]=x_center-side_length*cos(teta); vy[0]=y_center+side_length*sin(teta);
-    vx[1]=x_center+side_length*cos(teta); vy[1]=y_center+side_length*sin(teta);
-    vx[2]=x_center+side_length; vy[2]=y_center;
-    vx[3]=x_center+side_length*cos(teta); vy[3]=y_center-side_length*sin(teta);
-    vx[4]=x_center-side_length*cos(teta); vy[4]=y_center-side_length*sin(teta);
-    vx[5]=x_center-side_length; vy[5]=y_center;
-    filledPolygonRGBA(renderer, vx, vy, 6, colors[which_color].r,
-                                           colors[which_color].g,
-                                           colors[which_color].b,
-                                           alpha);
 }
 
 void initialize_country_array(country country_array[number_of_countries],
