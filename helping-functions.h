@@ -10,7 +10,6 @@ int event_handling(SDL_Event*, country*, SDL_Point, attack**);
 void update_attacking_soldiers_position(country*, attack**, int, potion*);
 void check_for_collisions(attack**, country*);
 void initialize_soldiers(attack**, country*);
-void update_attack_head(attack**);
 void check_if_attack_is_empty(attack**);
 void potion_logic(country*, attack**, int, int*, potion*);
 

@@ -1,4 +1,12 @@
 #include "include.h"
+
+typedef struct user
+{
+    char username[20];
+    int score;
+}
+user;
+
 typedef struct soldier
 {
     int color;

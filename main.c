@@ -1,12 +1,16 @@
 #include "menu.h"
 /*function prototypes*/
 void main_menu(SDL_Renderer*, TTF_Font*, TTF_Font*);
+int get_username(SDL_Renderer*, SDL_Texture*, SDL_Rect);
+void update_username_box(SDL_Renderer*, SDL_Surface**, SDL_Texture**, SDL_Rect*, char*, TTF_Font*, SDL_Color, SDL_Rect);
+void SDL_DestroyEverything_get_username();
 void SDL_DestroyEverything_main_menu(SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**);
 
 int main()
 {
     /*initializing graphic system*/
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER);
+    TTF_Init();
     /*initializinig the windows*/
     Uint32 window_flags=SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
     SDL_Window* window= SDL_CreateWindow("Initial window",
@@ -18,7 +22,6 @@ int main()
     Uint32 render_flags=SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, render_flags);
     /*opening the font*/
-    TTF_Init();
     TTF_Font* font=TTF_OpenFont("../fonts/TNR.ttf", 26);
     TTF_Font* bold_font=TTF_OpenFont("../fonts/TNR_B.ttf", 24);
     /*initializing countries*/
@@ -36,6 +39,121 @@ int main()
     TTF_Quit();
     SDL_Quit();
     return 0;
+}
+
+void update_username_box(SDL_Renderer* renderer, SDL_Surface** surface, SDL_Texture** texture, SDL_Rect* rect, char* line, TTF_Font* font, SDL_Color color, SDL_Rect relative_rect)
+{
+    *surface=TTF_RenderText_Solid(font, line, color);
+    *texture=SDL_CreateTextureFromSurface(renderer, *surface);
+    rect->h=(*surface)->h;
+    rect->w=(*surface)->w;
+    rect->x=window_width/2-190;
+    rect->y=relative_rect.y+relative_rect.h+20;
+}
+
+int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Rect background_rect)
+{
+    SDL_Event event;
+    SDL_Point mouse_position;
+    TTF_Font* enter_font=TTF_OpenFont("../fonts/TNR_B.ttf", 60);
+    SDL_Color enter_textColor={255, 0, 0, 255};
+    SDL_Surface* enter_surface=TTF_RenderText_Solid(enter_font, "Please Enter Your Username", enter_textColor);
+    SDL_Texture* enter_texture=SDL_CreateTextureFromSurface(renderer, enter_surface);
+    SDL_Rect enter_rect;
+    enter_rect.x=(window_width-enter_surface->w)/2;
+    enter_rect.y=200;
+    enter_rect.w=enter_surface->w;
+    enter_rect.h=enter_surface->h;
+    TTF_Font* username_font=TTF_OpenFont("../fonts/TNR.ttf", 30);
+    SDL_Color username_color={0, 0, 0, 255};
+    SDL_Surface* username_text_surface;
+    SDL_Texture* username_text_texture;
+    SDL_Rect username_text_rect;
+    TTF_Font* warning_font=TTF_OpenFont("../fonts/TNR.ttf", 40);
+    SDL_Color warning_textColor={255, 0, 0, 255};
+    SDL_Surface* warning_surface=TTF_RenderText_Solid(warning_font, "your username must have less than 20 characters", warning_textColor);
+    SDL_Texture* warning_texture=SDL_CreateTextureFromSurface(renderer, warning_surface);
+    SDL_Rect warning_rect;
+    warning_rect.x=(window_width-warning_surface->w)/2;
+    warning_rect.y=800;
+    warning_rect.w=warning_surface->w;
+    warning_rect.h=warning_surface->h;
+    int show_warning=0;
+    int close_requested=0;
+    int index=0;
+    char temp_username[20];
+    int max_username_length=20;
+    for (int i=0 ; i<max_username_length ; i++)
+    {
+        temp_username[i]='\0';
+    }
+    sprintf(temp_username, " ");
+    update_username_box(renderer, &username_text_surface, &username_text_texture, &username_text_rect, temp_username, username_font, username_color, enter_rect);
+    SDL_StartTextInput();
+    while(!close_requested)
+    {
+        SDL_RenderClear(renderer);
+        while(SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+                case (SDL_QUIT):
+                    SDL_DestroyEverything_get_username();
+                    return game_quit;
+                case (SDL_KEYDOWN):
+                    switch(event.key.keysym.sym)
+                    {
+                        case (SDLK_BACKSPACE):
+                            show_warning=0;
+                            if (index>1)
+                            {
+                                temp_username[index-1]='\0';
+                                index--;
+                            }
+                            else
+                            {
+                                if (index==1)
+                                {
+                                    temp_username[index-1]=' ';
+                                    index--;
+                                }
+                            }
+                            update_username_box(renderer, &username_text_surface, &username_text_texture, &username_text_rect, temp_username, username_font, username_color, enter_rect);
+                            printf("%s\n", temp_username);
+                            break;
+                        case (SDLK_RETURN):
+                            strcpy(main_user.username, temp_username);
+                            return nothing;
+                            break;
+                    }
+                    break;
+                case (SDL_TEXTINPUT):
+                    if (strlen(temp_username)>=max_username_length)
+                    {
+                        show_warning=1;
+                    }
+                    else
+                    {
+                    strcpy(temp_username+index, event.text.text);
+                    index=strlen(temp_username);
+                    update_username_box(renderer, &username_text_surface, &username_text_texture, &username_text_rect, temp_username, username_font, username_color, enter_rect);
+                    }
+                    break;
+            }
+        }
+        SDL_RenderCopy(renderer, background_texture, NULL, &background_rect);
+        SDL_RenderCopy(renderer, enter_texture, NULL, &enter_rect);
+        boxRGBA(renderer, window_width/2-205, enter_rect.y+enter_rect.h+10, window_width/2+205,
+                                              enter_rect.y+enter_rect.h+65, 0, 0, 255, 255);
+        boxRGBA(renderer, window_width/2-200, enter_rect.y+enter_rect.h+15, window_width/2+200,
+                                              enter_rect.y+enter_rect.h+60, 255, 255, 255, 255);
+        SDL_RenderCopy(renderer, username_text_texture, NULL, &username_text_rect);
+        if (show_warning) SDL_RenderCopy(renderer, warning_texture, NULL, &warning_rect);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(1000/FPS);
+    }
+    SDL_StopTextInput();
+    return nothing;
 }
 
 void main_menu(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* bold_font)
@@ -120,6 +238,13 @@ void main_menu(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* bold_font)
     TTF_CloseFont(state_io_text_font);
     TTF_CloseFont(button_text_font);
     TTF_CloseFont(description_font);
+
+    if (get_username(renderer, background_texture, background_rect)==game_quit)
+    {
+        SDL_DestroyEverything_main_menu(&background_texture, &button_texture, &texture_state_io, &new_game_text_texture, &resume_game_text_texture, &scoreboard_text_texture, &description_text_texture);
+        return;
+    }
+
     int close_requested=0;
     while(!close_requested)
     {
@@ -193,6 +318,11 @@ void SDL_DestroyEverything_main_menu(SDL_Texture** texture1, SDL_Texture** textu
     SDL_DestroyTexture(*texture5);
     SDL_DestroyTexture(*texture6);
     SDL_DestroyTexture(*texture7);
+}
+
+void SDL_DestroyEverything_get_username()
+{
+
 }
 /*
     SDL_Rect rectangle;

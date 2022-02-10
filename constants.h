@@ -22,6 +22,8 @@ double space_between_two_soldiers=60;
 double initial_distance_between_players=40;
 int potion_time_on_screen=5;
 
+user main_user;
+
 #define number_of_potions 4
 
 const int shadow_alpha=127;
