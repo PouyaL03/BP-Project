@@ -143,7 +143,7 @@ int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Re
         SDL_RenderCopy(renderer, background_texture, NULL, &background_rect);
         SDL_RenderCopy(renderer, enter_texture, NULL, &enter_rect);
         boxRGBA(renderer, window_width/2-205, enter_rect.y+enter_rect.h+10, window_width/2+205,
-                                              enter_rect.y+enter_rect.h+65, 0, 0, 255, 255);
+                                              enter_rect.y+enter_rect.h+65, 0, 0, 0, 255);
         boxRGBA(renderer, window_width/2-200, enter_rect.y+enter_rect.h+15, window_width/2+200,
                                               enter_rect.y+enter_rect.h+60, 255, 255, 255, 255);
         SDL_RenderCopy(renderer, username_text_texture, NULL, &username_text_rect);

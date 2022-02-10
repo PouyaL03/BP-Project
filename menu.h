@@ -212,23 +212,137 @@ int resume_game(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Tex
 
 int view_scoreboard(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* button_texture, TTF_Font* font, TTF_Font* bold_font, SDL_Rect background_rect)
 {
-    TTF_Font* tmp_font=TTF_OpenFont("../fonts/TNR_B.ttf", 150);
-    SDL_Color tmp_textColor={255, 0, 0, 255};
-    SDL_Surface* tmp_surface=TTF_RenderText_Solid(tmp_font, "Under Construction", tmp_textColor);
-    SDL_Texture* tmp_texture=SDL_CreateTextureFromSurface(renderer, tmp_surface);
-    SDL_Rect tmp_rect;
-    tmp_rect.x=(window_width-tmp_surface->w)/2;
-    tmp_rect.y=(window_height-tmp_surface->h)/2;
-    tmp_rect.w=tmp_surface->w;
-    tmp_rect.h=tmp_surface->h;
-    SDL_RenderCopy(renderer, background_texture, NULL, &background_rect);
-    SDL_RenderCopy(renderer, tmp_texture, NULL, &tmp_rect);
-    SDL_RenderPresent(renderer);
-    SDL_Delay(5000);
-    TTF_CloseFont(tmp_font);
-    SDL_DestroyTexture(tmp_texture);
-    SDL_FreeSurface(tmp_surface);
-    return nothing;
+    int list_width=window_width-300;
+    int list_height=175;
+    int return_type=nothing;
+    SDL_Event event;
+    SDL_Point mouse_position;
+    FILE* number_of_users_file=fopen("../users_database/number_of_users.dat", "r");
+    int number_of_users;
+    fread(&number_of_users, sizeof(int), 1, number_of_users_file);
+    fclose(number_of_users_file);
+    user all_users[number_of_users];
+    FILE* users_file=fopen("../users_database/users.dat", "r");
+    fread(all_users, sizeof(user), number_of_users, users_file);
+    fclose(users_file);
+    int number_of_users_on_scoreboard=number_of_users;
+    if (number_of_users_on_scoreboard>5) number_of_users_on_scoreboard=5;
+    user all_users_on_scoreboard[number_of_users_on_scoreboard];
+    SDL_Texture* username_texture[number_of_users_on_scoreboard+1];
+    SDL_Surface* username_surface[number_of_users_on_scoreboard+1];
+    SDL_Texture* score_texture[number_of_users_on_scoreboard+1];
+    SDL_Surface* score_surface[number_of_users_on_scoreboard+1];
+    SDL_Rect score_rect[number_of_users_on_scoreboard+1];
+    SDL_Rect username_rect[number_of_users_on_scoreboard+1];
+    SDL_Rect button_rect[number_of_users_on_scoreboard];
+    
+    TTF_Font* main_font=TTF_OpenFont("../fonts/TNR_B.ttf", 60);
+    SDL_Color main_color={255, 255, 255, 255};
+    printf("%d\n", number_of_users_on_scoreboard);
+
+    for (int i=0 ; i<number_of_users_on_scoreboard ; i++)
+    {
+        button_rect[i].w=list_width;
+        button_rect[i].h=list_height;
+        button_rect[i].y=175+150*i;
+        button_rect[i].x=(window_width-list_width)/2;
+    }
+
+    all_users_on_scoreboard[0].score=all_users[0].score;
+    strcpy(all_users_on_scoreboard[0].username, all_users[0].username);
+
+    for (int i=1 ; i<number_of_users ; i++)
+    {
+        if (all_users[i].score>all_users_on_scoreboard[0].score)
+        {
+            all_users_on_scoreboard[0].score=all_users[i].score;
+            strcpy(all_users_on_scoreboard[0].username, all_users[i].username);
+        }
+    }
+
+    for (int i=1 ; i<number_of_users_on_scoreboard ; i++)
+    {
+        all_users_on_scoreboard[i].score=-1000000;
+        all_users_on_scoreboard[i].username[0]='\0';
+        all_users_on_scoreboard[i].username[1]='\0';
+        for (int j=0 ; j<number_of_users ; j++)
+        {
+            if (all_users[j].score>=all_users_on_scoreboard[i].score)
+            {
+                if (all_users[j].score<=all_users_on_scoreboard[i-1].score)
+                {
+                    if (strcmp(all_users[j].username, all_users_on_scoreboard[i-1].username)!=0)
+                    {
+                        all_users_on_scoreboard[i].score=all_users[j].score;
+                        strcpy(all_users_on_scoreboard[i].username, all_users[j].username);
+                    }
+                }
+            }
+        }
+    }
+
+    for (int i=0 ; i<number_of_users_on_scoreboard ; i++)
+    {
+        username_surface[i]=TTF_RenderText_Solid(main_font, all_users_on_scoreboard[i].username, main_color);
+        username_texture[i]=SDL_CreateTextureFromSurface(renderer, username_surface[i]);
+        username_rect[i].h=username_surface[i]->h;
+        username_rect[i].w=username_surface[i]->w;
+        username_rect[i].x=button_rect[i].x+80;
+        username_rect[i].y=button_rect[i].y+(button_rect[i].h-username_rect[i].h)/2-10;
+        char score[10];
+        score[0]='\0';
+        sprintf(score, "%d", all_users_on_scoreboard[i].score);
+        score_surface[i]=TTF_RenderText_Solid(main_font, score, main_color);
+        score_texture[i]=SDL_CreateTextureFromSurface(renderer, score_surface[i]);
+        score_rect[i].h=score_surface[i]->h;
+        score_rect[i].w=score_surface[i]->w;
+        score_rect[i].x=button_rect[i].x+button_rect[i].w-score_rect[i].w-140;
+        score_rect[i].y=button_rect[i].y+(button_rect[i].h-score_rect[i].h)/2-10;
+    }
+
+    TTF_Font* head_font=TTF_OpenFont("../fonts/TNR_B.ttf", 60);
+    SDL_Color head_color={255, 0, 0, 255};
+    username_surface[number_of_users_on_scoreboard]=TTF_RenderText_Solid(head_font, "USERNAME", head_color);
+    username_texture[number_of_users_on_scoreboard]=SDL_CreateTextureFromSurface(renderer, username_surface[number_of_users_on_scoreboard]);
+    username_rect[number_of_users_on_scoreboard].h=username_surface[number_of_users_on_scoreboard]->h;
+    username_rect[number_of_users_on_scoreboard].w=username_surface[number_of_users_on_scoreboard]->w;
+    username_rect[number_of_users_on_scoreboard].x=button_rect[0].x+60;
+    username_rect[number_of_users_on_scoreboard].y=125;
+    score_surface[number_of_users_on_scoreboard]=TTF_RenderText_Solid(head_font, "SCORE", head_color);
+    score_texture[number_of_users_on_scoreboard]=SDL_CreateTextureFromSurface(renderer, score_surface[number_of_users_on_scoreboard]);
+    score_rect[number_of_users_on_scoreboard].h=score_surface[number_of_users_on_scoreboard]->h;
+    score_rect[number_of_users_on_scoreboard].w=score_surface[number_of_users_on_scoreboard]->w;
+    score_rect[number_of_users_on_scoreboard].x=button_rect[0].x+button_rect[0].w-score_rect[number_of_users_on_scoreboard].w-100;
+    score_rect[number_of_users_on_scoreboard].y=125;
+    int close_requested=0;
+    while(!close_requested)
+    {
+        SDL_RenderClear(renderer);
+        while(SDL_PollEvent(&event))
+        {
+            switch(event.type)
+            {
+                case (SDL_QUIT):
+                    close_requested=1;
+                    return_type=game_quit;
+                    break;
+            }
+        }
+        SDL_RenderCopy(renderer, background_texture, NULL, &background_rect);
+        for (int i=0 ; i<number_of_users_on_scoreboard ; i++)
+        {
+            SDL_RenderCopy(renderer, button_texture, NULL, &button_rect[i]);
+        }
+        for (int i=0 ; i<number_of_users_on_scoreboard+1 ; i++)
+        {
+            SDL_RenderCopy(renderer, username_texture[i], NULL, &username_rect[i]);
+            SDL_RenderCopy(renderer, score_texture[i], NULL, &score_rect[i]);
+        }
+        SDL_RenderPresent(renderer);
+        SDL_Delay(1000/FPS);
+    }
+    SDL_DestroyEverything_view_scoreboard();
+    return return_type;
 }
 
 void SDL_DestroyEverything_new_game_menu(SDL_Texture** texture1, SDL_Texture** texture2, TTF_Font** font1)
@@ -246,6 +360,11 @@ void SDL_DestroyEverything_choose_map(map* all_maps, int number_of_maps, TTF_Fon
         SDL_FreeSurface(all_maps[i].text_surface);
     }
     TTF_CloseFont(*font1);
+}
+
+void SDL_DestroyEverything_view_scoreboard()
+{
+
 }
 /*
     //initializing countires

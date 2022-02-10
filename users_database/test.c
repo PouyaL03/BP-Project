@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 typedef struct user
 {
@@ -25,6 +26,7 @@ char* names[10]=
 
 int main()
 {
+    srand(0);
     FILE* file=fopen("users.dat", "r");
     FILE* number_of_users_file=fopen("number_of_users.dat", "r");
     int number_of_users;
@@ -47,7 +49,7 @@ int main()
     // fwrite(tmp, sizeof(user), 10, file);
 
     // FILE* file=fopen("number_of_users.dat", "w");
-    // int tmp=0;
+    // int tmp=10;
     // fwrite(&tmp, sizeof(int), 1, file);
 
     // FILE* file=fopen("number_of_users.dat", "r");

@@ -17,7 +17,6 @@ const int FPS=24;
 #define maximum_number_of_soldiers 90
 int waiting_for_attack=0;
 double initial_speed_of_players=7;
-/*space_between_two_soldiers=4*initial_speed_of_players*/
 double space_between_two_soldiers=60;
 double initial_distance_between_players=40;
 int potion_time_on_screen=5;
@@ -25,8 +24,6 @@ int potion_time_on_screen=5;
 user main_user;
 
 #define number_of_potions 4
-
-const int shadow_alpha=127;
 
 /*colors
 gray=0 (unallocated) {192, 192, 192, 255}
