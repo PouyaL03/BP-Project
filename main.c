@@ -3,7 +3,6 @@
 void main_menu(SDL_Renderer*, TTF_Font*, TTF_Font*);
 int get_username(SDL_Renderer*, SDL_Texture*, SDL_Rect);
 void update_username_box(SDL_Renderer*, SDL_Surface**, SDL_Texture**, SDL_Rect*, char*, TTF_Font*, SDL_Color, SDL_Rect);
-void SDL_DestroyEverything_get_username();
 void SDL_DestroyEverything_main_menu(SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**);
 void find_user(char*);
 
@@ -80,6 +79,7 @@ int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Re
     warning_rect.w=warning_surface->w;
     warning_rect.h=warning_surface->h;
     int show_warning=0;
+    int return_type=nothing;
     int close_requested=0;
     int index=0;
     char temp_username[21];
@@ -91,6 +91,7 @@ int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Re
     sprintf(temp_username, " ");
     update_username_box(renderer, &username_text_surface, &username_text_texture, &username_text_rect, temp_username, username_font, username_color, enter_rect);
     SDL_StartTextInput();
+
     while(!close_requested)
     {
         SDL_RenderClear(renderer);
@@ -99,8 +100,9 @@ int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Re
             switch (event.type)
             {
                 case (SDL_QUIT):
-                    SDL_DestroyEverything_get_username();
-                    return game_quit;
+                    return_type=game_quit;
+                    close_requested=1;
+                    break;
                 case (SDL_KEYDOWN):
                     switch(event.key.keysym.sym)
                     {
@@ -122,6 +124,8 @@ int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Re
                             update_username_box(renderer, &username_text_surface, &username_text_texture, &username_text_rect, temp_username, username_font, username_color, enter_rect);
                             break;
                         case (SDLK_RETURN):
+                            close_requested=1;
+                            return_type=nothing;
                             find_user(temp_username);
                             return nothing;
                     }
@@ -151,8 +155,18 @@ int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Re
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);
     }
+
+    TTF_CloseFont(username_font);
+    TTF_CloseFont(enter_font);
+    TTF_CloseFont(warning_font);
+    SDL_FreeSurface(enter_surface);
+    SDL_FreeSurface(username_text_surface);
+    SDL_FreeSurface(warning_surface);
+    SDL_DestroyTexture(warning_texture);
+    SDL_DestroyTexture(username_text_texture);
+    SDL_DestroyTexture(enter_texture);
     SDL_StopTextInput();
-    return nothing;
+    return return_type;
 }
 
 void find_user(char* input_username)
@@ -368,10 +382,6 @@ void SDL_DestroyEverything_main_menu(SDL_Texture** texture1, SDL_Texture** textu
     SDL_DestroyTexture(*texture7);
 }
 
-void SDL_DestroyEverything_get_username()
-{
-
-}
 /*
     SDL_Rect rectangle;
     SDL_Texture* texture;

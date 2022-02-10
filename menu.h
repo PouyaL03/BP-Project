@@ -6,10 +6,10 @@ int new_game_menu(SDL_Renderer*, SDL_Texture*, SDL_Texture*, TTF_Font*, TTF_Font
 int resume_game(SDL_Renderer*, SDL_Texture*, SDL_Texture*, TTF_Font*, TTF_Font*, SDL_Rect);
 int view_scoreboard(SDL_Renderer*, SDL_Texture*, SDL_Texture*, TTF_Font*, TTF_Font*, SDL_Rect);
 int choose_map(SDL_Renderer*, SDL_Texture*, SDL_Texture*, TTF_Font*, TTF_Font*, SDL_Rect, SDL_Color);
-void SDL_DestroyEverything_new_game_menu(SDL_Texture**, SDL_Texture**, TTF_Font**);
-void SDL_DestroyEverything_choose_map(map*, int, TTF_Font**);
+void SDL_DestroyEverything_new_game_menu(SDL_Texture**, SDL_Texture**, TTF_Font**, SDL_Texture**);
+void SDL_DestroyEverything_choose_map(map*, int, TTF_Font**, SDL_Texture**);
 void SDL_DestroyEverything_resume_game_menu();
-void SDL_DestroyEverything_view_scoreboard();
+void SDL_DestroyEverything_view_scoreboard(SDL_Texture**, SDL_Texture**, int);
 
 int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* button_texture, TTF_Font* font, TTF_Font* bold_font, SDL_Rect background_rect, SDL_Color button_textColor)
 {
@@ -42,6 +42,22 @@ int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Text
         all_maps[i].text_rect.w=all_maps[i].text_surface->w;
         all_maps[i].text_rect.h=all_maps[i].text_surface->h;
     }
+
+    SDL_Surface* back_button_surface=IMG_Load("../images/back_button.png");
+    SDL_Texture* back_button_texture=SDL_CreateTextureFromSurface(renderer, back_button_surface);
+    SDL_Rect back_button_rect;
+    back_button_rect.x=20;
+    back_button_rect.y=20;
+    back_button_rect.w=80;
+    back_button_rect.h=80;
+    int back_button_radius=sqrt(back_button_rect.w*back_button_rect.w*2);
+    SDL_Point back_button_center;
+    back_button_center.x=back_button_rect.x+back_button_rect.w/2;
+    back_button_center.y=back_button_rect.y+back_button_rect.y/2;
+    SDL_FreeSurface(back_button_surface);
+
+    
+
     int close_requested=0;
     while (!close_requested)
     {
@@ -53,7 +69,7 @@ int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Text
             {
                 case (SDL_QUIT):
                     close_requested=1;
-                    SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font);
+                    SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font, &back_button_texture);
                     return game_quit;
                 case (SDL_MOUSEBUTTONDOWN):
                     if (event.button.button!=SDL_BUTTON_LEFT) break;
@@ -74,14 +90,21 @@ int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Text
                                 switch(start_game(renderer, font, bold_font, country_array))
                                 {
                                     case(game_quit):
-                                        SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font);
+                                        SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font, &back_button_texture);
                                         return game_quit;
                                     case(game_finished):
-                                        SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font);
+                                        SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font, &back_button_texture);
                                         return game_finished;
                                 }
                                 break;
                             }
+                    if ((mouse_position.x-back_button_center.x)*(mouse_position.x-back_button_center.y)+
+                        (mouse_position.y-back_button_center.y)*(mouse_position.y-back_button_center.y)<
+                        (back_button_radius*back_button_radius))
+                        {
+                            close_requested=1;
+                            break;
+                        }   
                     }
             }
         }
@@ -91,10 +114,11 @@ int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Text
             SDL_RenderCopy(renderer, button_texture, NULL, &all_maps[i].button_rect);
             SDL_RenderCopy(renderer, all_maps[i].text_texture, NULL, &all_maps[i].text_rect);
         }
+        SDL_RenderCopy(renderer, back_button_texture, NULL, &back_button_rect);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);
     }
-    SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font);
+    SDL_DestroyEverything_choose_map(all_maps, number_of_maps, &button_text_font, &back_button_texture);
     return nothing;
 }
 
@@ -107,6 +131,8 @@ int new_game_menu(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_T
     SDL_Texture* choose_map_text_texture=SDL_CreateTextureFromSurface(renderer, choose_map_text_surface);
     SDL_Surface* random_map_text_surface=TTF_RenderText_Solid(button_text_font, "RANDOM MAP", button_textColor);
     SDL_Texture* random_map_text_texture=SDL_CreateTextureFromSurface(renderer, random_map_text_surface);
+    SDL_Surface* back_button_surface=IMG_Load("../images/back_button.png");
+    SDL_Texture* back_button_texture=SDL_CreateTextureFromSurface(renderer, back_button_surface);
     SDL_Rect choose_map_button_rect;
     choose_map_button_rect.h=button_height;
     choose_map_button_rect.w=button_width;
@@ -127,6 +153,16 @@ int new_game_menu(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_T
     random_map_text_rect.y=random_map_button_rect.y+(random_map_button_rect.h-random_map_text_surface->h)/2;
     random_map_text_rect.w=random_map_text_surface->w;
     random_map_text_rect.h=random_map_text_surface->h;
+    SDL_Rect back_button_rect;
+    back_button_rect.x=20;
+    back_button_rect.y=20;
+    back_button_rect.w=80;
+    back_button_rect.h=80;
+    int back_button_radius=sqrt(back_button_rect.w*back_button_rect.w*2);
+    SDL_Point back_button_center;
+    back_button_center.x=back_button_rect.x+back_button_rect.w/2;
+    back_button_center.y=back_button_rect.y+back_button_rect.y/2;
+    SDL_FreeSurface(back_button_surface);
     SDL_FreeSurface(choose_map_text_surface);
     SDL_FreeSurface(random_map_text_surface);
     int close_requested=0;
@@ -140,7 +176,7 @@ int new_game_menu(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_T
             {
                 case (SDL_QUIT):
                     close_requested=1;
-                    SDL_DestroyEverything_new_game_menu(&choose_map_text_texture, &random_map_text_texture, &button_text_font);
+                    SDL_DestroyEverything_new_game_menu(&choose_map_text_texture, &random_map_text_texture, &button_text_font, &back_button_texture);
                     return game_quit;
                 case (SDL_MOUSEBUTTONDOWN):
                     if (event.button.button!=SDL_BUTTON_LEFT) break;
@@ -155,10 +191,10 @@ int new_game_menu(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_T
                             switch(start_game(renderer, font, bold_font, country_array))
                             {
                                 case(game_quit):
-                                    SDL_DestroyEverything_new_game_menu(&random_map_text_texture, &choose_map_text_texture, &button_text_font);
+                                    SDL_DestroyEverything_new_game_menu(&random_map_text_texture, &choose_map_text_texture, &button_text_font, &back_button_texture);
                                     return game_quit;
                                 case(game_finished):
-                                    SDL_DestroyEverything_new_game_menu(&random_map_text_texture, &choose_map_text_texture, &button_text_font);
+                                    SDL_DestroyEverything_new_game_menu(&random_map_text_texture, &choose_map_text_texture, &button_text_font, &back_button_texture);
                                     return game_finished;
                             }
                         }
@@ -168,13 +204,20 @@ int new_game_menu(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_T
                                 switch(choose_map(renderer, background_texture, button_texture, font, bold_font, background_rect, button_textColor))
                                 {
                                     case(game_quit):
-                                        SDL_DestroyEverything_new_game_menu(&random_map_text_texture, &choose_map_text_texture, &button_text_font);
+                                        SDL_DestroyEverything_new_game_menu(&random_map_text_texture, &choose_map_text_texture, &button_text_font, &back_button_texture);
                                         return game_quit;
                                     case(game_finished):
-                                        SDL_DestroyEverything_new_game_menu(&random_map_text_texture, &choose_map_text_texture, &button_text_font);
+                                        SDL_DestroyEverything_new_game_menu(&random_map_text_texture, &choose_map_text_texture, &button_text_font, &back_button_texture);
                                         return game_finished;
                                 }
                             }
+                    else if ((mouse_position.x-back_button_center.x)*(mouse_position.x-back_button_center.y)+
+                             (mouse_position.y-back_button_center.y)*(mouse_position.y-back_button_center.y)<
+                             (back_button_radius*back_button_radius))
+                             {
+                                close_requested=1;
+                                break;
+                             }
             }
         }
         SDL_RenderCopy(renderer, background_texture, NULL, &background_rect);
@@ -182,10 +225,11 @@ int new_game_menu(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_T
         SDL_RenderCopy(renderer, button_texture, NULL, &random_map_button_rect);
         SDL_RenderCopy(renderer, choose_map_text_texture, NULL, &choose_map_text_rect);
         SDL_RenderCopy(renderer, random_map_text_texture, NULL, &random_map_text_rect);
+        SDL_RenderCopy(renderer, back_button_texture, NULL, &back_button_rect);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);
     }
-    SDL_DestroyEverything_new_game_menu(&choose_map_text_texture, &random_map_text_texture, &button_text_font);
+    SDL_DestroyEverything_new_game_menu(&choose_map_text_texture, &random_map_text_texture, &button_text_font, &back_button_texture);
     return nothing;
 }
 
@@ -238,7 +282,6 @@ int view_scoreboard(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL
     
     TTF_Font* main_font=TTF_OpenFont("../fonts/TNR_B.ttf", 60);
     SDL_Color main_color={255, 255, 255, 255};
-    printf("%d\n", number_of_users_on_scoreboard);
 
     for (int i=0 ; i<number_of_users_on_scoreboard ; i++)
     {
@@ -314,6 +357,26 @@ int view_scoreboard(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL
     score_rect[number_of_users_on_scoreboard].w=score_surface[number_of_users_on_scoreboard]->w;
     score_rect[number_of_users_on_scoreboard].x=button_rect[0].x+button_rect[0].w-score_rect[number_of_users_on_scoreboard].w-100;
     score_rect[number_of_users_on_scoreboard].y=125;
+
+    SDL_Surface* back_button_surface=IMG_Load("../images/back_button.png");
+    SDL_Texture* back_button_texture=SDL_CreateTextureFromSurface(renderer, back_button_surface);
+    SDL_Rect back_button_rect;
+    back_button_rect.x=20;
+    back_button_rect.y=20;
+    back_button_rect.w=80;
+    back_button_rect.h=80;
+    int back_button_radius=sqrt(back_button_rect.w*back_button_rect.w*2);
+    SDL_Point back_button_center;
+    back_button_center.x=back_button_rect.x+back_button_rect.w/2;
+    back_button_center.y=back_button_rect.y+back_button_rect.y/2;
+    for (int i=0 ; i<number_of_users_on_scoreboard+1 ; i++)
+    {
+        SDL_FreeSurface(username_surface[i]);
+        SDL_FreeSurface(score_surface[i]);
+    }
+    SDL_FreeSurface(back_button_surface);
+    TTF_CloseFont(head_font);
+    TTF_CloseFont(main_font);
     int close_requested=0;
     while(!close_requested)
     {
@@ -326,6 +389,17 @@ int view_scoreboard(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL
                     close_requested=1;
                     return_type=game_quit;
                     break;
+                case (SDL_MOUSEBUTTONDOWN):
+                    if (event.button.button!=SDL_BUTTON_LEFT) continue;
+                    SDL_GetMouseState(&mouse_position.x, &mouse_position.y);
+                    if ((mouse_position.x-back_button_center.x)*(mouse_position.x-back_button_center.y)+
+                        (mouse_position.y-back_button_center.y)*(mouse_position.y-back_button_center.y)<
+                        (back_button_radius*back_button_radius))
+                        {
+                            close_requested=1;
+                            return_type=previous_page;
+                            break;
+                        }
             }
         }
         SDL_RenderCopy(renderer, background_texture, NULL, &background_rect);
@@ -338,33 +412,40 @@ int view_scoreboard(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL
             SDL_RenderCopy(renderer, username_texture[i], NULL, &username_rect[i]);
             SDL_RenderCopy(renderer, score_texture[i], NULL, &score_rect[i]);
         }
+        SDL_RenderCopy(renderer, back_button_texture, NULL, &back_button_rect);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);
     }
-    SDL_DestroyEverything_view_scoreboard();
+    SDL_DestroyEverything_view_scoreboard(username_texture, score_texture, number_of_users_on_scoreboard+1);
     return return_type;
 }
 
-void SDL_DestroyEverything_new_game_menu(SDL_Texture** texture1, SDL_Texture** texture2, TTF_Font** font1)
+void SDL_DestroyEverything_new_game_menu(SDL_Texture** texture1, SDL_Texture** texture2, TTF_Font** font1, SDL_Texture** texture3)
 {
     SDL_DestroyTexture(*texture1);
     SDL_DestroyTexture(*texture2);
+    SDL_DestroyTexture(*texture3);
     TTF_CloseFont(*font1);
 }
 
-void SDL_DestroyEverything_choose_map(map* all_maps, int number_of_maps, TTF_Font** font1)
+void SDL_DestroyEverything_choose_map(map* all_maps, int number_of_maps, TTF_Font** font1, SDL_Texture** texture1)
 {
     for (int i=0 ; i<number_of_maps ; i++)
     {
         SDL_DestroyTexture(all_maps[i].text_texture);
         SDL_FreeSurface(all_maps[i].text_surface);
     }
+    SDL_DestroyTexture(*texture1);
     TTF_CloseFont(*font1);
 }
 
-void SDL_DestroyEverything_view_scoreboard()
+void SDL_DestroyEverything_view_scoreboard(SDL_Texture**texture2, SDL_Texture** texture1, int n)
 {
-
+    for (int i=0 ; i<n ; i++)
+    {
+        SDL_DestroyTexture(texture1[i]);
+        SDL_DestroyTexture(texture2[i]);
+    }
 }
 /*
     //initializing countires

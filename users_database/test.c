@@ -31,6 +31,7 @@ int main()
     FILE* number_of_users_file=fopen("number_of_users.dat", "r");
     int number_of_users;
     fread(&number_of_users, sizeof(int), 1, number_of_users_file);
+    printf("%d\n", number_of_users);
     user tmp[number_of_users];
     fread(tmp, sizeof(user), number_of_users, file);
     for (int i=0 ; i<number_of_users ; i++)
@@ -49,7 +50,7 @@ int main()
     // fwrite(tmp, sizeof(user), 10, file);
 
     // FILE* file=fopen("number_of_users.dat", "w");
-    // int tmp=10;
+    // int tmp=0;
     // fwrite(&tmp, sizeof(int), 1, file);
 
     // FILE* file=fopen("number_of_users.dat", "r");
