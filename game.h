@@ -257,15 +257,3 @@ void AI(country* country_array, attack** attack_head)
         }
     }
 }
-    // /*select color of background*/
-    // SDL_Surface* surface = IMG_Load("../images/sample-picture.png");
-    // /*loading the texture to the windows*/
-    // SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    // SDL_FreeSurface(surface);
-    // /*creating a single rectangle to save the pic into it*/
-    // SDL_Rect destination;
-    // SDL_QueryTexture(texture, NULL, NULL, &destination.w, &destination.h);
-    // destination.w/=4;
-    // destination.h/=4;
-    // float x_position=(window_width-destination.w)/2;
-    // float y_position=(window_height-destination.h)/2;

@@ -1,5 +1,4 @@
 #include "game.h"
-#include <SDL_ttf.h>
 
 /*function prototypes*/
 int new_game_menu(SDL_Renderer*, SDL_Texture*, SDL_Texture*, TTF_Font*, TTF_Font*, SDL_Rect, SDL_Color);
@@ -447,12 +446,3 @@ void SDL_DestroyEverything_view_scoreboard(SDL_Texture**texture2, SDL_Texture** 
         SDL_DestroyTexture(texture2[i]);
     }
 }
-/*
-    //initializing countires
-    country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row];
-    create_random_map(all_countries);
-    country country_array[number_of_countries];
-    initialize_country_array(country_array, all_countries);
-    main_menu(renderer, font, bold_font);
-    start_game(renderer, font, bold_font, country_array);    
-*/

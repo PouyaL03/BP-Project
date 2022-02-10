@@ -381,21 +381,3 @@ void SDL_DestroyEverything_main_menu(SDL_Texture** texture1, SDL_Texture** textu
     SDL_DestroyTexture(*texture6);
     SDL_DestroyTexture(*texture7);
 }
-
-/*
-    SDL_Rect rectangle;
-    SDL_Texture* texture;
-    SDL_Color textColor={0, 0, 0, 255};
-    SDL_Surface* surface;
-    if (waiting_for_attack==0) surface=TTF_RenderText_Solid(font, "please choose country to attack from", textColor);
-    else if (waiting_for_attack==1) surface=TTF_RenderText_Solid(font, "plase choose where you want to attack", textColor);
-    texture=SDL_CreateTextureFromSurface(renderer, surface);
-    int text_width = surface->w;
-    int text_height = surface->h;
-    SDL_FreeSurface(surface);
-    rectangle.x = (window_width-text_width)/2;
-    rectangle.y = window_height-(text_height+10);
-    rectangle.w = text_width;
-    rectangle.h = text_height;
-    SDL_RenderCopy(renderer, texture, NULL, &rectangle);
-    SDL_DestroyTexture(texture);*/
