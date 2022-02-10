@@ -2,7 +2,7 @@
 
 typedef struct user
 {
-    char username[20];
+    char username[21];
     int score;
 }
 user;

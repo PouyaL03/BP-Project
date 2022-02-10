@@ -5,6 +5,7 @@ int get_username(SDL_Renderer*, SDL_Texture*, SDL_Rect);
 void update_username_box(SDL_Renderer*, SDL_Surface**, SDL_Texture**, SDL_Rect*, char*, TTF_Font*, SDL_Color, SDL_Rect);
 void SDL_DestroyEverything_get_username();
 void SDL_DestroyEverything_main_menu(SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**, SDL_Texture**);
+void find_user(char*);
 
 int main()
 {
@@ -81,9 +82,9 @@ int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Re
     int show_warning=0;
     int close_requested=0;
     int index=0;
-    char temp_username[20];
+    char temp_username[21];
     int max_username_length=20;
-    for (int i=0 ; i<max_username_length ; i++)
+    for (int i=0 ; i<max_username_length+1 ; i++)
     {
         temp_username[i]='\0';
     }
@@ -122,9 +123,9 @@ int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Re
                             printf("%s\n", temp_username);
                             break;
                         case (SDLK_RETURN):
-                            strcpy(main_user.username, temp_username);
+                            find_user(temp_username);
+                            printf("%s\t%d\n", main_user.username, main_user.score);
                             return nothing;
-                            break;
                     }
                     break;
                 case (SDL_TEXTINPUT):
@@ -154,6 +155,59 @@ int get_username(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Re
     }
     SDL_StopTextInput();
     return nothing;
+}
+
+void find_user(char* input_username)
+{
+    /*finding number of users*/
+    FILE* number_of_users_file=fopen("../users_database/number_of_users.dat", "r");
+    int number_of_users;
+    fread(&number_of_users, sizeof(int), 1, number_of_users_file);
+    fclose(number_of_users_file);
+    FILE* users_file;
+    if (number_of_users==0)
+    {
+        number_of_users_file=fopen("../users_database/number_of_users.dat", "w");
+        number_of_users++;
+        fwrite(&number_of_users, sizeof(int), 1, number_of_users_file);
+        fclose(number_of_users_file);
+        users_file=fopen("../users_database/users.dat", "w");
+        main_user.score=0;
+        strcpy(main_user.username, input_username);
+        fwrite(&main_user, sizeof(user), number_of_users, users_file);
+        fclose(number_of_users_file);
+    }
+    else
+    {
+        user all_users[number_of_users+1];
+        users_file=fopen("../users_database/users.dat", "r");
+        fread(all_users, sizeof(user), number_of_users, users_file);
+        fclose(users_file);
+        for (int i=0 ; i<number_of_users ; i++)
+        {
+            printf("%s\t%d\n", all_users[i].username, all_users[i].score);
+        }
+        for (int i=0 ; i<number_of_users ; i++)
+        {
+            if (strcmp(all_users[i].username, input_username)==0)
+            {
+                main_user.score=all_users[i].score;
+                strcpy(main_user.username, all_users[i].username);
+                return;
+            }
+        }
+        all_users[number_of_users].score=0;
+        strcpy(all_users[number_of_users].username, input_username);
+        number_of_users_file=fopen("../users_database/number_of_users.dat", "w");
+        number_of_users++;
+        fwrite(&number_of_users, sizeof(int), 1, number_of_users_file);
+        fclose(number_of_users_file);
+        users_file=fopen("../users_database/users.dat", "w");
+        main_user.score=0;
+        strcpy(main_user.username, input_username);
+        fwrite(all_users, sizeof(user), number_of_users, users_file);
+        fclose(number_of_users_file);
+    }
 }
 
 void main_menu(SDL_Renderer* renderer, TTF_Font* font, TTF_Font* bold_font)
