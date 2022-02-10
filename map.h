@@ -1,7 +1,7 @@
 #include "helping-functions.h"
 
 /*function prototypes*/
-void draw_map(SDL_Renderer*, country*, TTF_Font*, TTF_Font*, attack**);
+void draw_map(SDL_Renderer*, country*, TTF_Font*, TTF_Font*, attack**, potion);
 void create_random_map(country all_countries[number_of_hexagons_in_column][number_of_hexagons_in_row]);
 void show_number_of_soldiers(SDL_Renderer*, int, int, int, TTF_Font*, country*, int);
 void show_line(SDL_Renderer*, TTF_Font*);
@@ -73,20 +73,12 @@ void create_random_map(country all_countries[number_of_hexagons_in_column][numbe
     }
 }
 
-void draw_map(SDL_Renderer* renderer, country* all_countries, TTF_Font* bold_font, TTF_Font* font, attack** attack_head)
+void draw_map(SDL_Renderer* renderer, country* all_countries, TTF_Font* bold_font, TTF_Font* font, attack** attack_head, potion on_screen_potion)
 {
     for (int i=0 ; i<number_of_countries ; i++)
     {
         Uint8 alpha=255;
         int which_color=all_countries[i].color;
-        // if (which_color!=unallocated_color && which_color!=no_player_color)
-        // {
-        //     if (all_countries[i].number_of_soldiers+all_countries[i].soldiers_in_use<=maximum_number_of_soldiers)
-        //     {
-        //         alpha=55+200*((all_countries[i].soldiers_in_use+all_countries[i].number_of_soldiers))/maximum_number_of_soldiers;
-        //     }
-        // }
-        // else alpha=100;
         draw_hexagon_borderline(renderer, all_countries[i].x_center,
                                 all_countries[i].y_center,
                                 initial_side_length,
@@ -120,6 +112,10 @@ void draw_map(SDL_Renderer* renderer, country* all_countries, TTF_Font* bold_fon
                                               1.2*initial_side_length,
                                               which_color, alpha);
         }
+    }
+    if (on_screen_potion.enable==1)
+    {
+        aacircleRGBA(renderer, on_screen_potion.x_center, on_screen_potion.y_center, 50, 0, 0, 0, 255);
     }
     show_attacking_soldiers(renderer, all_countries, attack_head);
     show_line(renderer, font);

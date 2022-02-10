@@ -7,9 +7,9 @@ int resume_game(SDL_Renderer*, SDL_Texture*, SDL_Texture*, TTF_Font*, TTF_Font*,
 int view_scoreboard(SDL_Renderer*, SDL_Texture*, SDL_Texture*, TTF_Font*, TTF_Font*, SDL_Rect);
 int choose_map(SDL_Renderer*, SDL_Texture*, SDL_Texture*, TTF_Font*, TTF_Font*, SDL_Rect, SDL_Color);
 void SDL_DestroyEverything_new_game_menu(SDL_Texture**, SDL_Texture**, TTF_Font**);
+void SDL_DestroyEverything_choose_map(map*, int, TTF_Font**);
 void SDL_DestroyEverything_resume_game_menu();
 void SDL_DestroyEverything_view_scoreboard();
-void SDL_DestroyEverything_choose_map(map*, int, TTF_Font**);
 
 int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Texture* button_texture, TTF_Font* font, TTF_Font* bold_font, SDL_Rect background_rect, SDL_Color button_textColor)
 {
@@ -22,14 +22,12 @@ int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Text
     fclose(number_of_maps_file);
     map all_maps[number_of_maps];
     sprintf(all_maps[0].name, "TEST MAP");
-    printf("%s\n", all_maps[0].name);
     for (int i=1 ; i<number_of_maps ; i++)
     {
         all_maps[i].name[0]='M';
         all_maps[i].name[1]='A';
         all_maps[i].name[2]='P';
         sprintf(all_maps[i].name+3, "%d", i);
-        printf("%s\n", all_maps[i].name);
     }
     for (int i=0 ; i<number_of_maps ; i++)
     {
@@ -70,12 +68,9 @@ int choose_map(SDL_Renderer* renderer, SDL_Texture* background_texture, SDL_Text
                                 if(i!=0) sprintf(file_name+strlen(file_name), all_maps[i].name);
                                 else sprintf(file_name+strlen(file_name), "MAP0");
                                 sprintf(file_name+strlen(file_name), ".dat");
-                                printf("%s\n", file_name);
-                                printf("hello darling.\n");
                                 FILE* map_file=fopen(file_name, "r");
                                 number_of_countries=fread(country_array, sizeof(country), maximum_number_of_countries, map_file);
                                 fclose(map_file);
-                                printf("marg bar america.\n");
                                 switch(start_game(renderer, font, bold_font, country_array))
                                 {
                                     case(game_quit):

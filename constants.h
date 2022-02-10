@@ -20,6 +20,9 @@ double initial_speed_of_players=7;
 /*space_between_two_soldiers=4*initial_speed_of_players*/
 double space_between_two_soldiers=60;
 double initial_distance_between_players=40;
+int potion_time_on_screen=5;
+
+#define number_of_potions 4
 
 const int shadow_alpha=127;
 
@@ -34,7 +37,17 @@ gray=6 (no player) {160, 160, 160, 255}
 background color=7 {220, 220, 220, 255}
 */
 
-enum color_name{unallocated_color, blue, green, yellow, pink, violet, no_player_color, background_color};
+enum color_name{unallocated_color, blue, green, yellow, pink, violet, no_player_color, background_color, potion_on_screen};
+
+enum potion_names{increase_soldiers_movement_speed, decrease_enemy_soldiers_movement_speed, enemy_soldiers_change_side, increase_soldiers_generation_speed};
+
+SDL_Color potion_colors[number_of_potions]=
+{
+    {},
+    {},
+    {},
+    {}
+};
 
 SDL_Color colors[number_of_colors]=
 {

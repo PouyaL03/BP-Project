@@ -12,6 +12,20 @@ int start_game(SDL_Renderer* renderer, TTF_Font* font,TTF_Font* bold_font, count
     SDL_Point mouse_position;
     int total_frames=0;
     attack* attack_head=NULL;
+    int time_to_deploy=0;
+    potion all_colors_potion[number_of_colors+1];
+    for (int i=0 ; i<number_of_colors+1 ; i++)
+    {
+        all_colors_potion[i].enable=0;
+        all_colors_potion[i].time=0;
+        all_colors_potion[i].x_center=-40;
+        all_colors_potion[i].y_center=-40;
+        for (int j=0 ; j<number_of_potions ; j++)
+        {
+            all_colors_potion[i].type[j]=0;
+        }
+    }
+    /*last potion is the potion on the screen*/
     /*------------------------------------------------------------------------------------*/
     while (1)
     {
@@ -29,9 +43,10 @@ int start_game(SDL_Renderer* renderer, TTF_Font* font,TTF_Font* bold_font, count
                                colors[background_color].g,
                                colors[background_color].b, 255);
         SDL_RenderClear(renderer);
-        update_attacking_soldiers_position(country_array, &attack_head, total_frames);
-        draw_map(renderer, country_array, bold_font, font, &attack_head);
+        update_attacking_soldiers_position(country_array, &attack_head, total_frames, all_colors_potion);
+        potion_logic(country_array, &attack_head, total_frames, &time_to_deploy, all_colors_potion);
         AI(country_array, &attack_head);
+        draw_map(renderer, country_array, bold_font, font, &attack_head, all_colors_potion[potion_on_screen]);
         SDL_RenderPresent(renderer);
         SDL_Delay(1000/FPS);
         total_frames++;

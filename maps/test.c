@@ -35,7 +35,7 @@ int main()
     create_random_map(all_countries);
     country country_array[number_of_countries];
     initialize_country_array(country_array, all_countries);
-    FILE* map_file = fopen("map_data/MAP0.dat", "w");
+    FILE* map_file = fopen("map_data/MAP2.dat", "w");
     fwrite(country_array, sizeof(country), number_of_countries, map_file);
     fclose(map_file);
     return 0;
@@ -45,8 +45,6 @@ void create_random_map(country all_countries[number_of_hexagons_in_column][numbe
 {
     time_t t;
     srand(time(&t));
-    int number_of_player_countries=0;
-    int tmp=1;
     double space_from_above;
     double space_from_side;
     double image_of_hexagon=initial_side_length*2*sin(teta);
@@ -56,18 +54,12 @@ void create_random_map(country all_countries[number_of_hexagons_in_column][numbe
     {
         for (int j=0 ; j<number_of_hexagons_in_row ; j++)
         {
-            int which_color;
-            if (tmp && rand()%20==0)
+            int which_color=rand()%10+1;
+            if (which_color>6)
             {
-                which_color=pink;
-                tmp=0;
+                if (which_color>8) which_color=0;
+                else which_color=6;
             }
-            else if (rand()%2==0 && number_of_player_countries<12)
-            {
-                which_color=blue;
-                number_of_player_countries++;
-            }
-            else which_color=0;
             all_countries[i][j].soldiers_in_use=0;
             all_countries[i][j].glow_flag=0;
             all_countries[i][j].color=which_color;

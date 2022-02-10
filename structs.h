@@ -12,10 +12,11 @@ soldier;
 
 typedef struct potion
 {
-    int increase_soldiers_movement_speed;
-    int decrease_enemy_soldiers_movement_speed;
-    int enemy_soldiers_change_side;
-    int increase_soldiers_generation_speed;
+    int type[4];
+    int enable;
+    int time;
+    int x_center;
+    int y_center;
 }
 potion;
 

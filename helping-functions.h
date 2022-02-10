@@ -9,11 +9,118 @@ void check_mouse_state(SDL_Point, country*, double);
 void update_number_of_soldiers(country*, int);
 int find_country_index(country*, SDL_Point, double);
 int event_handling(SDL_Event*, country*, SDL_Point, attack**);
-void update_attacking_soldiers_position(country*, attack**, int);
+void update_attacking_soldiers_position(country*, attack**, int, potion*);
 void check_for_collisions(attack**, country*);
 void initialize_soldiers(attack**, country*);
 void update_attack_head(attack**);
 void check_if_attack_is_empty(attack**);
+void potion_logic(country*, attack**, int, int*, potion*);
+
+void potion_logic(country* country_array, attack** attack_head, int total_frames, int* time_to_deploy, potion* all_colors_potion)
+{
+    // printf("%d\n", (*time_to_deploy));
+    if ((*time_to_deploy)==0 && total_frames==0)
+    {
+        (*time_to_deploy)=FPS*((rand()%4)+2);
+    }
+    else if ((*time_to_deploy)==0)
+    {
+        (*time_to_deploy)=FPS*((rand()%8)+2);
+        int flag=1;
+        for (int i=0 ; flag && i<number_of_countries ; i++)
+        {
+            for (int j=0 ; flag && j<number_of_countries ; j++)
+            {
+                if (country_array[i].color!=unallocated_color && country_array[j].color!=unallocated_color)
+                {
+                    if (country_array[i].color!=no_player_color || country_array[j].color!=no_player_color)
+                    {
+                        if (rand()%600==0)
+                        {
+                            // printf("marg please.\n");
+                            flag=0;
+                            double coefficient = rand()%600 + 200;
+                            coefficient/=1000;
+                            all_colors_potion[potion_on_screen].x_center=country_array[i].x_center+coefficient*(country_array[j].x_center-country_array[i].x_center);
+                            all_colors_potion[potion_on_screen].y_center=country_array[i].y_center+coefficient*(country_array[j].y_center-country_array[i].y_center);
+                            // int which_potion=rand()%4;
+                            int which_potion=0;
+                            for (int i=0 ; i<number_of_potions ; i++)
+                            {
+                                all_colors_potion[potion_on_screen].type[i]=0;
+                            }
+                            all_colors_potion[potion_on_screen].type[which_potion]=1;
+                            all_colors_potion[potion_on_screen].enable=1;
+                            all_colors_potion[potion_on_screen].time=(*time_to_deploy);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        (*time_to_deploy)--;
+        if (all_colors_potion[potion_on_screen].enable==1)
+        {
+            if (all_colors_potion[potion_on_screen].time>0)
+            {
+                all_colors_potion[potion_on_screen].time--;
+            }
+            else if (all_colors_potion[potion_on_screen].time==0)
+            {
+                all_colors_potion[potion_on_screen].enable=0;
+            }
+        }
+    }
+    if (all_colors_potion[potion_on_screen].enable==1)
+    {
+        attack* tmp_attack_head=*attack_head;
+        if (waiting_for_attack==1) tmp_attack_head=tmp_attack_head->next_attack;
+        int flag=1;
+        for ( ; flag && tmp_attack_head!=NULL ; tmp_attack_head=tmp_attack_head->next_attack)
+        {
+            soldier* tmp_soldier_head=tmp_attack_head->soldier_head;
+            for ( ; flag && tmp_soldier_head!=NULL ; tmp_soldier_head=tmp_soldier_head->next_soldier)
+            {
+                int which_color=tmp_soldier_head->color;
+                if (all_colors_potion[which_color].enable==1) break;
+                if ((tmp_soldier_head->soldier_position_x-all_colors_potion[potion_on_screen].x_center)*(tmp_soldier_head->soldier_position_x-all_colors_potion[potion_on_screen].x_center)+
+                    (tmp_soldier_head->soldier_position_y-all_colors_potion[potion_on_screen].y_center)*(tmp_soldier_head->soldier_position_y-all_colors_potion[potion_on_screen].y_center)<
+                    60*60)
+                    {
+                        all_colors_potion[which_color].enable=1;
+                        for (int i=0 ; i<number_of_potions ; i++)
+                        {
+                            all_colors_potion[which_color].type[i]=all_colors_potion[potion_on_screen].type[i];
+                        }
+                        all_colors_potion[which_color].time=FPS*potion_time_on_screen;
+                        all_colors_potion[which_color].enable=1;
+                        flag=0;
+                        all_colors_potion[potion_on_screen].enable=0;
+                        all_colors_potion[potion_on_screen].time=0;
+                        // (*time_to_deploy)=0;
+                        // printf("it's superpower time.\n");
+                    }
+            }
+        }
+    }
+    for (int i=0 ; i<number_of_colors ; i++)
+    {
+        if (all_colors_potion[i].enable==1)
+        {
+            if(all_colors_potion[i].time>0) all_colors_potion[i].time--;
+            else if(all_colors_potion[i].time==0)
+            {
+                for (int i=0 ; i<number_of_potions ; i++)
+                {
+                    all_colors_potion[i].type[i]=0;
+                }
+                all_colors_potion[i].enable=0;
+            }
+        }
+    }
+}
 
 void check_if_attack_is_empty(attack** attack_head)
 {
@@ -142,7 +249,7 @@ void initialize_soldiers(attack** attack_head, country* country_array)
     tmp->soldier_position_y=country_array[(*attack_head)->attacking_country_index].y_center;
 }
 
-void update_attacking_soldiers_position(country* country_array, attack** attack_head, int total_frames)
+void update_attacking_soldiers_position(country* country_array, attack** attack_head, int total_frames, potion* all_colors_potion)
 {
     check_for_collisions(attack_head, country_array);
     attack* tmp_attack_head=(*attack_head);
@@ -207,10 +314,18 @@ void update_attacking_soldiers_position(country* country_array, attack** attack_
                 }
             }
         }
+        int coefficient=1;
+        if (tmp_soldier_head!=NULL && all_colors_potion[tmp_soldier_head->color].enable==1)
+        {
+            if (all_colors_potion[tmp_soldier_head->color].type[increase_soldiers_movement_speed]==1)
+            {
+                coefficient=3;
+            }
+        }
         for ( ; tmp_soldier_head!=NULL ; tmp_soldier_head=tmp_soldier_head->next_soldier)
         {
-            tmp_soldier_head->soldier_position_x+=initial_speed_of_players*cosinus;
-            tmp_soldier_head->soldier_position_y+=initial_speed_of_players*sinus;
+            tmp_soldier_head->soldier_position_x+=coefficient*initial_speed_of_players*cosinus;
+            tmp_soldier_head->soldier_position_y+=coefficient*initial_speed_of_players*sinus;
             if ((tmp_soldier_head->soldier_position_x-attacking_x)*(tmp_soldier_head->soldier_position_x-attacking_x)+
                 (tmp_soldier_head->soldier_position_y-attacking_y)*(tmp_soldier_head->soldier_position_y-attacking_y)<
                 initial_distance_between_players*initial_distance_between_players)
@@ -310,11 +425,6 @@ int event_handling(SDL_Event* event, country* country_array, SDL_Point mouse_pos
                         printf("defending country is:%d\n", tmp->defenfing_country_index);
                         fflush(stdin);
                         tmp=tmp->next_attack;
-                    }
-                    for (int i=0 ; i<number_of_countries ; i++)
-                    {
-                        printf("number of soldiers in country %d :%d\n", i, country_array[i].number_of_soldiers);
-                        printf("number of soldiers in use in country %d :%d\n", i, country_array[i].soldiers_in_use);
                     }
                     printf("-----------------------------------------\n");
                     fflush(stdin);
